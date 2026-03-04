@@ -6,7 +6,6 @@ export function createTables() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
       phone TEXT NOT NULL UNIQUE,
-      pin_hash TEXT,
       avatar_emoji TEXT DEFAULT '👤',
       location_sharing INTEGER DEFAULT 1,
       push_token TEXT,
@@ -90,12 +89,6 @@ export function createTables() {
     CREATE INDEX IF NOT EXISTS idx_push_subscriptions_user ON push_subscriptions(user_id);
   `);
 
-  // Migration: add pin_hash column to existing databases
-  const columns = db.pragma("table_info(users)");
-  if (!columns.some((c) => c.name === "pin_hash")) {
-    db.exec("ALTER TABLE users ADD COLUMN pin_hash TEXT");
-  }
-
-  // Cleanup: drop legacy otp_codes table if it exists
+  // Cleanup: drop legacy tables if they exist
   db.exec("DROP TABLE IF EXISTS otp_codes");
 }

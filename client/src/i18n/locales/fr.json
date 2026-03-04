@@ -112,14 +112,6 @@
   "approved": "Approuvé ✅",
   "rejected": "Refusé",
   "phoneHint": "+33...",
-  "pinLabel": "Code PIN à 4 chiffres",
-  "pinHint": "Choisissez un code PIN à 4 chiffres dont vous vous souviendrez",
-  "loginTitle": "Bon retour",
-  "loginDesc": "Entrez votre téléphone et votre PIN pour continuer",
-  "loginBtn": "Connexion",
-  "registerBtn": "S'inscrire",
-  "haveAccount": "Déjà inscrit ? Se connecter",
-  "noAccount": "Pas encore de compte ? S'inscrire",
-  "invalidCredentials": "Numéro de téléphone ou PIN incorrect",
-  "phoneExists": "Ce numéro de téléphone est déjà enregistré"
+  "continueBtn": "Continuer",
+  "enterDetails": "Entrez vos coordonnées"
 }

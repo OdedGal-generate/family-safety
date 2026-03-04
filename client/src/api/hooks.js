@@ -5,19 +5,10 @@ import { demoSubGroups, demoPendingRequests } from "../data/demoSubGroups.js";
 
 // ── Auth ──
 
-export function useRegisterUser() {
+export function useEnter() {
   return useMutation({
-    mutationFn: async ({ name, phone, pin }) => {
-      const { data } = await api.post("/auth/register", { name, phone, pin });
-      return data;
-    },
-  });
-}
-
-export function useLogin() {
-  return useMutation({
-    mutationFn: async ({ phone, pin }) => {
-      const { data } = await api.post("/auth/login", { phone, pin });
+    mutationFn: async ({ name, phone }) => {
+      const { data } = await api.post("/auth/enter", { name, phone });
       return data;
     },
   });

@@ -112,14 +112,6 @@
   "approved": "אושר ✅",
   "rejected": "נדחה",
   "phoneHint": "052...",
-  "pinLabel": "קוד PIN בן 4 ספרות",
-  "pinHint": "בחר קוד PIN בן 4 ספרות שתזכור",
-  "loginTitle": "ברוך שובך",
-  "loginDesc": "הכנס מספר טלפון וקוד PIN כדי להמשיך",
-  "loginBtn": "התחברות",
-  "registerBtn": "הרשמה",
-  "haveAccount": "כבר רשום? התחבר",
-  "noAccount": "אין לך חשבון? הירשם",
-  "invalidCredentials": "מספר טלפון או קוד PIN שגוי",
-  "phoneExists": "מספר טלפון זה כבר רשום"
+  "continueBtn": "המשך",
+  "enterDetails": "הזינו את הפרטים"
 }

@@ -112,14 +112,6 @@
   "approved": "تمت الموافقة ✅",
   "rejected": "مرفوض",
   "phoneHint": "+972...",
-  "pinLabel": "رمز PIN مكون من 4 أرقام",
-  "pinHint": "اختر رمز PIN مكون من 4 أرقام يمكنك تذكره",
-  "loginTitle": "مرحبًا بعودتك",
-  "loginDesc": "أدخل رقم هاتفك ورمز PIN للمتابعة",
-  "loginBtn": "تسجيل الدخول",
-  "registerBtn": "تسجيل",
-  "haveAccount": "مسجل بالفعل؟ تسجيل الدخول",
-  "noAccount": "ليس لديك حساب؟ سجل الآن",
-  "invalidCredentials": "رقم الهاتف أو رمز PIN غير صحيح",
-  "phoneExists": "رقم الهاتف هذا مسجل بالفعل"
+  "continueBtn": "متابعة",
+  "enterDetails": "أدخل بياناتك"
 }

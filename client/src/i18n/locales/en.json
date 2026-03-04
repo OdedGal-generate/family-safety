@@ -112,14 +112,6 @@
   "approved": "Approved ✅",
   "rejected": "Rejected",
   "phoneHint": "+972...",
-  "pinLabel": "4-Digit PIN",
-  "pinHint": "Choose a 4-digit PIN you'll remember",
-  "loginTitle": "Welcome Back",
-  "loginDesc": "Enter your phone and PIN to continue",
-  "loginBtn": "Login",
-  "registerBtn": "Register",
-  "haveAccount": "Already registered? Login",
-  "noAccount": "Don't have an account? Register",
-  "invalidCredentials": "Incorrect phone number or PIN",
-  "phoneExists": "This phone number is already registered"
+  "continueBtn": "Continue",
+  "enterDetails": "Enter Your Details"
 }

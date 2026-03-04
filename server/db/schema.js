@@ -6,6 +6,7 @@ export function createTables() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
       phone TEXT NOT NULL UNIQUE,
+      pin_hash TEXT,
       avatar_emoji TEXT DEFAULT '👤',
       location_sharing INTEGER DEFAULT 1,
       push_token TEXT,
@@ -77,15 +78,6 @@ export function createTables() {
     CREATE INDEX IF NOT EXISTS idx_group_invites_token ON group_invites(token);
     CREATE INDEX IF NOT EXISTS idx_group_member_requests_group ON group_member_requests(group_id, status);
 
-    CREATE TABLE IF NOT EXISTS otp_codes (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      phone TEXT NOT NULL,
-      code TEXT NOT NULL,
-      expires_at TEXT NOT NULL,
-      used INTEGER DEFAULT 0,
-      created_at TEXT DEFAULT (datetime('now'))
-    );
-
     CREATE TABLE IF NOT EXISTS push_subscriptions (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL REFERENCES users(id),
@@ -95,7 +87,15 @@ export function createTables() {
       created_at TEXT DEFAULT (datetime('now'))
     );
 
-    CREATE INDEX IF NOT EXISTS idx_otp_codes_phone ON otp_codes(phone, used);
     CREATE INDEX IF NOT EXISTS idx_push_subscriptions_user ON push_subscriptions(user_id);
   `);
+
+  // Migration: add pin_hash column to existing databases
+  const columns = db.pragma("table_info(users)");
+  if (!columns.some((c) => c.name === "pin_hash")) {
+    db.exec("ALTER TABLE users ADD COLUMN pin_hash TEXT");
+  }
+
+  // Cleanup: drop legacy otp_codes table if it exists
+  db.exec("DROP TABLE IF EXISTS otp_codes");
 }

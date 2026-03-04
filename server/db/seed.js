@@ -1,13 +1,17 @@
 import db from "./index.js";
 import { v4 as uuidv4 } from "uuid";
+import bcrypt from "bcryptjs";
 
 export function seedDemoData() {
   // Only seed if users table is empty
   const count = db.prepare("SELECT COUNT(*) as c FROM users").get().c;
   if (count > 0) return;
 
+  // All demo users get PIN "1234"
+  const demoPinHash = bcrypt.hashSync("1234", 10);
+
   const insertUser = db.prepare(
-    "INSERT INTO users (name, phone, avatar_emoji) VALUES (?, ?, ?)"
+    "INSERT INTO users (name, phone, avatar_emoji, pin_hash) VALUES (?, ?, ?, ?)"
   );
   const insertGroup = db.prepare(
     "INSERT INTO groups (name, type, owner_id, parent_group_id, depth_level) VALUES (?, ?, ?, ?, ?)"
@@ -27,27 +31,27 @@ export function seedDemoData() {
 
   const seed = db.transaction(() => {
     // ── Main family members (matching frontend demoMembers) ──
-    const adi = insertUser.run("עדי", "054-1111111", "👩").lastInsertRowid;
-    const yonatan = insertUser.run("יונתן", "054-2222222", "👨").lastInsertRowid;
-    const maya = insertUser.run("מאיה", "054-3333333", "👧").lastInsertRowid;
-    const noam = insertUser.run("נועם", "054-4444444", "👦").lastInsertRowid;
-    const grandpaMoshe = insertUser.run("סבא משה", "054-5555555", "👴").lastInsertRowid;
-    const grandmaRuth = insertUser.run("סבתא רות", "054-6666666", "👵").lastInsertRowid;
+    const adi = insertUser.run("עדי", "054-1111111", "👩", demoPinHash).lastInsertRowid;
+    const yonatan = insertUser.run("יונתן", "054-2222222", "👨", demoPinHash).lastInsertRowid;
+    const maya = insertUser.run("מאיה", "054-3333333", "👧", demoPinHash).lastInsertRowid;
+    const noam = insertUser.run("נועם", "054-4444444", "👦", demoPinHash).lastInsertRowid;
+    const grandpaMoshe = insertUser.run("סבא משה", "054-5555555", "👴", demoPinHash).lastInsertRowid;
+    const grandmaRuth = insertUser.run("סבתא רות", "054-6666666", "👵", demoPinHash).lastInsertRowid;
 
     // ── Sub-group 1 members: משפחת דוד ──
-    const david = insertUser.run("דוד", "054-7777777", "👨").lastInsertRowid;
-    const sarah = insertUser.run("שרה", "054-8888888", "👩").lastInsertRowid;
-    const tamar = insertUser.run("תמר", "054-9999999", "👧").lastInsertRowid;
+    const david = insertUser.run("דוד", "054-7777777", "👨", demoPinHash).lastInsertRowid;
+    const sarah = insertUser.run("שרה", "054-8888888", "👩", demoPinHash).lastInsertRowid;
+    const tamar = insertUser.run("תמר", "054-9999999", "👧", demoPinHash).lastInsertRowid;
 
     // ── Sub-group 2 members: משפחת מיכל ──
-    const michal = insertUser.run("מיכל", "054-1010101", "👩").lastInsertRowid;
-    const alon = insertUser.run("אלון", "054-1020202", "👨").lastInsertRowid;
-    const yuval = insertUser.run("יובל", "054-1030303", "👦").lastInsertRowid;
-    const noa = insertUser.run("נועה", "054-1040404", "👧").lastInsertRowid;
-    const omer = insertUser.run("עומר", "054-1050505", "👶").lastInsertRowid;
+    const michal = insertUser.run("מיכל", "054-1010101", "👩", demoPinHash).lastInsertRowid;
+    const alon = insertUser.run("אלון", "054-1020202", "👨", demoPinHash).lastInsertRowid;
+    const yuval = insertUser.run("יובל", "054-1030303", "👦", demoPinHash).lastInsertRowid;
+    const noa = insertUser.run("נועה", "054-1040404", "👧", demoPinHash).lastInsertRowid;
+    const omer = insertUser.run("עומר", "054-1050505", "👶", demoPinHash).lastInsertRowid;
 
     // ── Pending request user ──
-    const davidLevi = insertUser.run("David Levi", "054-1060606", "👤").lastInsertRowid;
+    const davidLevi = insertUser.run("David Levi", "054-1060606", "👤", demoPinHash).lastInsertRowid;
 
     // ── Main group ──
     const mainGroup = insertGroup.run("משפחת כהן", "family", yonatan, null, 0).lastInsertRowid;

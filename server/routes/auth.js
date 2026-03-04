@@ -1,74 +1,66 @@
 import { Router } from "express";
+import bcrypt from "bcryptjs";
 import db from "../db/index.js";
 import { signToken, requireAuth } from "../middleware/auth.js";
-import { sendOtp } from "../services/sms.js";
 import { validate, schemas } from "../middleware/validate.js";
 
 const router = Router();
+const SALT_ROUNDS = 10;
 
-// POST /api/auth/send-otp — generate OTP and send via SMS (or log in mock mode)
-router.post("/send-otp", validate(schemas.sendOtp), async (req, res) => {
-  const { phone } = req.body;
+// POST /api/auth/register — create new user with name + phone + PIN
+router.post("/register", validate(schemas.register), async (req, res) => {
+  const { name, phone, pin } = req.body;
 
-  // Invalidate previous unused codes for this phone
-  db.prepare("UPDATE otp_codes SET used = 1 WHERE phone = ? AND used = 0").run(phone);
-
-  // Generate 6-digit code
-  const code = String(Math.floor(100000 + Math.random() * 900000));
-
-  // Save with 10-minute expiry
-  db.prepare(
-    "INSERT INTO otp_codes (phone, code, expires_at) VALUES (?, ?, datetime('now', '+10 minutes'))"
-  ).run(phone, code);
-
-  // Send via Twilio or log in mock mode
-  const result = await sendOtp(phone, code);
-
-  res.json({ success: true, mock: result.mock });
-});
-
-// POST /api/auth/verify-otp — verify OTP code, return JWT
-router.post("/verify-otp", validate(schemas.verifyOtp), (req, res) => {
-  const { phone, code } = req.body;
-
-  // Find valid OTP
-  const otp = db
-    .prepare(
-      "SELECT * FROM otp_codes WHERE phone = ? AND code = ? AND used = 0 AND expires_at > datetime('now') ORDER BY id DESC LIMIT 1"
-    )
-    .get(phone, code);
-
-  if (!otp) {
-    return res.status(401).json({ error: "Invalid or expired code" });
-  }
-
-  // Mark as used
-  db.prepare("UPDATE otp_codes SET used = 1 WHERE id = ?").run(otp.id);
-
-  // Find or create user
-  let user = db
-    .prepare("SELECT id, name, phone, avatar_emoji FROM users WHERE phone = ?")
+  // Check if phone already exists
+  const existing = db
+    .prepare("SELECT id FROM users WHERE phone = ?")
     .get(phone);
 
-  let isNew = false;
-  if (!user) {
-    const result = db
-      .prepare("INSERT INTO users (name, phone) VALUES ('', ?)")
-      .run(phone);
-    user = db
-      .prepare("SELECT id, name, phone, avatar_emoji FROM users WHERE id = ?")
-      .get(result.lastInsertRowid);
-    isNew = true;
-  } else if (!user.name) {
-    isNew = true;
+  if (existing) {
+    return res.status(409).json({ error: "Phone number already registered" });
+  }
+
+  const pin_hash = await bcrypt.hash(pin, SALT_ROUNDS);
+
+  const result = db
+    .prepare(
+      "INSERT INTO users (name, phone, pin_hash) VALUES (?, ?, ?)"
+    )
+    .run(name, phone, pin_hash);
+
+  const user = db
+    .prepare("SELECT id, name, phone, avatar_emoji FROM users WHERE id = ?")
+    .get(result.lastInsertRowid);
+
+  const token = signToken(user.id);
+  res.status(201).json({ user, token });
+});
+
+// POST /api/auth/login — authenticate with phone + PIN
+router.post("/login", validate(schemas.login), async (req, res) => {
+  const { phone, pin } = req.body;
+
+  const user = db
+    .prepare("SELECT id, name, phone, avatar_emoji, pin_hash FROM users WHERE phone = ?")
+    .get(phone);
+
+  if (!user || !user.pin_hash) {
+    return res.status(401).json({ error: "Invalid phone number or PIN" });
+  }
+
+  const valid = await bcrypt.compare(pin, user.pin_hash);
+  if (!valid) {
+    return res.status(401).json({ error: "Invalid phone number or PIN" });
   }
 
   const token = signToken(user.id);
-  res.json({ user, token, isNew });
+  // Don't leak pin_hash to client
+  const { pin_hash, ...safeUser } = user;
+  res.json({ user: safeUser, token });
 });
 
-// POST /api/auth/register — update profile (name/avatar) after OTP verification
-router.post("/register", requireAuth, validate(schemas.register), (req, res) => {
+// POST /api/auth/profile — update profile (name/avatar) after auth
+router.post("/profile", requireAuth, validate(schemas.profile), (req, res) => {
   const { name, avatar_emoji } = req.body;
 
   db.prepare("UPDATE users SET name = ?, avatar_emoji = ? WHERE id = ?").run(

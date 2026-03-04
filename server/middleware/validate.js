@@ -56,19 +56,25 @@ export function validate(schema) {
 
 // ── Joi schemas ──
 
+const phonePattern = /^\+?[0-9\s\-()]+$/;
+
 export const schemas = {
-  sendOtp: Joi.object({
-    phone: Joi.string().trim().min(7).max(20).pattern(/^\+?[0-9\s\-()]+$/).required()
-      .messages({ "string.pattern.base": "Invalid phone number format" }),
-  }),
-
-  verifyOtp: Joi.object({
-    phone: Joi.string().trim().min(7).max(20).pattern(/^\+?[0-9\s\-()]+$/).required(),
-    code: Joi.string().trim().length(6).pattern(/^[0-9]+$/).required()
-      .messages({ "string.pattern.base": "Code must be 6 digits" }),
-  }),
-
   register: Joi.object({
+    name: Joi.string().trim().min(1).max(100).required(),
+    phone: Joi.string().trim().min(7).max(20).pattern(phonePattern).required()
+      .messages({ "string.pattern.base": "Invalid phone number format" }),
+    pin: Joi.string().trim().length(4).pattern(/^[0-9]+$/).required()
+      .messages({ "string.pattern.base": "PIN must be 4 digits" }),
+  }),
+
+  login: Joi.object({
+    phone: Joi.string().trim().min(7).max(20).pattern(phonePattern).required()
+      .messages({ "string.pattern.base": "Invalid phone number format" }),
+    pin: Joi.string().trim().length(4).pattern(/^[0-9]+$/).required()
+      .messages({ "string.pattern.base": "PIN must be 4 digits" }),
+  }),
+
+  profile: Joi.object({
     name: Joi.string().trim().min(1).max(100).required(),
     avatar_emoji: Joi.string().max(10).optional(),
   }),

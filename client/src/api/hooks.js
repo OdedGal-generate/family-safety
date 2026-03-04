@@ -5,28 +5,28 @@ import { demoSubGroups, demoPendingRequests } from "../data/demoSubGroups.js";
 
 // ── Auth ──
 
-export function useSendOtp() {
+export function useRegisterUser() {
   return useMutation({
-    mutationFn: async ({ phone }) => {
-      const { data } = await api.post("/auth/send-otp", { phone });
+    mutationFn: async ({ name, phone, pin }) => {
+      const { data } = await api.post("/auth/register", { name, phone, pin });
       return data;
     },
   });
 }
 
-export function useVerifyOtp() {
+export function useLogin() {
   return useMutation({
-    mutationFn: async ({ phone, code }) => {
-      const { data } = await api.post("/auth/verify-otp", { phone, code });
+    mutationFn: async ({ phone, pin }) => {
+      const { data } = await api.post("/auth/login", { phone, pin });
       return data;
     },
   });
 }
 
-export function useRegister() {
+export function useUpdateProfile() {
   return useMutation({
     mutationFn: async ({ name, avatar_emoji }) => {
-      const { data } = await api.post("/auth/register", { name, avatar_emoji });
+      const { data } = await api.post("/auth/profile", { name, avatar_emoji });
       return data;
     },
   });

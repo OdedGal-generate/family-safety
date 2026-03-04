@@ -10,6 +10,7 @@ import authRoutes from "./routes/auth.js";
 import groupRoutes from "./routes/groups.js";
 import statusRoutes from "./routes/status.js";
 import pushRoutes from "./routes/push.js";
+import adminRoutes from "./routes/admin.js";
 import { sanitize } from "./middleware/validate.js";
 
 dotenv.config();
@@ -54,10 +55,10 @@ app.use((req, res, next) => {
 // ── Input sanitization (HTML strip + dangerous char rejection) ──
 app.use(sanitize);
 
-// ── Rate limiting: auth routes (strict) ──
+// ── Rate limiting: auth routes ──
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5,
+  max: 20,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Too many requests, please try again later" },
@@ -70,10 +71,10 @@ const authSlowDown = slowDown({
   delayMs: (hits) => (hits - 3) * 500,
 });
 
-// ── Rate limiting: general API (lenient) ──
+// ── Rate limiting: general API ──
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 200,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Too many requests, please try again later" },
@@ -89,6 +90,7 @@ app.use("/api/auth", authSlowDown, authLimiter, authRoutes);
 app.use("/api/groups", apiLimiter, groupRoutes);
 app.use("/api/status", apiLimiter, statusRoutes);
 app.use("/api/push", apiLimiter, pushRoutes);
+app.use("/admin", adminRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

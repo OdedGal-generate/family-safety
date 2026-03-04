@@ -5,24 +5,26 @@ const USER_KEY = "familyShield_user";
 const GROUP_KEY = "familyShield_groupId";
 
 // Resolve API base URL — auto-append /api if the env var doesn't include it
-let resolvedBaseURL = import.meta.env.VITE_API_URL || "/api";
+let resolvedBaseURL = (import.meta.env.VITE_API_URL || "/api").replace(/\/+$/, "");
 if (resolvedBaseURL !== "/api" && !resolvedBaseURL.endsWith("/api")) {
-  resolvedBaseURL = resolvedBaseURL.replace(/\/+$/, "") + "/api";
+  resolvedBaseURL += "/api";
 }
 
-console.log("[API] baseURL:", resolvedBaseURL);
+console.log("[API] VITE_API_URL env:", import.meta.env.VITE_API_URL || "(not set)");
+console.log("[API] resolved baseURL:", resolvedBaseURL);
 
 const api = axios.create({
   baseURL: resolvedBaseURL,
   headers: { "Content-Type": "application/json" },
 });
 
-// Attach JWT token to every request
+// Attach JWT token and log full URL for every request
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem(TOKEN_KEY);
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  console.log(`[API] ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
   return config;
 });
 

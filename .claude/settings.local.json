@@ -28,7 +28,9 @@
       "Bash(curl -s -X POST http://localhost:5173/api/auth/send-otp -H \"Content-Type: application/json\" -d '{\"\"phone\"\": \"\"+972501111111\"\"}')",
       "Bash(npm run build)",
       "Bash(git init)",
-      "Bash(git add -A)"
+      "Bash(git add -A)",
+      "Bash(git commit:*)",
+      "Bash(git add .claude/settings.local.json)"
     ]
   }
 }

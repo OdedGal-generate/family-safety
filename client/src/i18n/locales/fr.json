@@ -114,9 +114,12 @@
   "phoneHint": "+33...",
   "continueBtn": "Continuer",
   "enterDetails": "Entrez vos coordonnées",
-  "installTitle": "Ajouter à l'écran d'accueil",
-  "installDesc": "Installez Bouclier Familial pour un accès rapide et le mode hors ligne",
+  "installDesc": "Ajoutez à votre écran d'accueil pour un accès instantané en cas d'urgence",
   "installBtn": "Installer",
-  "installIOSStep1": "Appuyez sur le bouton Partager",
-  "installIOSStep2": "puis \"Sur l'écran d'accueil\""
+  "installIOSStep1Label": "Étape 1 :",
+  "installIOSStep1": "Appuyez sur le bouton Partager en bas",
+  "installIOSStep2Label": "Étape 2 :",
+  "installIOSStep2": "Appuyez sur \"Sur l'écran d'accueil\"",
+  "installGotIt": "Compris",
+  "installNotNow": "Pas maintenant"
 }

@@ -114,9 +114,12 @@
   "phoneHint": "+972...",
   "continueBtn": "Continue",
   "enterDetails": "Enter Your Details",
-  "installTitle": "Add to Home Screen",
-  "installDesc": "Install Family Shield for quick access and offline support",
+  "installDesc": "Add to your home screen for instant access during emergencies",
   "installBtn": "Install",
-  "installIOSStep1": "Tap the Share button",
-  "installIOSStep2": "then \"Add to Home Screen\""
+  "installIOSStep1Label": "Step 1:",
+  "installIOSStep1": "Tap the Share button at the bottom",
+  "installIOSStep2Label": "Step 2:",
+  "installIOSStep2": "Tap \"Add to Home Screen\"",
+  "installGotIt": "Got it",
+  "installNotNow": "Not now"
 }

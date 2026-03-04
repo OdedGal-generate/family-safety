@@ -114,9 +114,12 @@
     "ja": "日本語",
     "uk": "Українська"
   },
-  "installTitle": "添加到主屏幕",
-  "installDesc": "安装家庭盾牌以便快速访问和离线支持",
+  "installDesc": "添加到主屏幕，紧急情况下即时访问",
   "installBtn": "安装",
-  "installIOSStep1": "点击分享按钮",
-  "installIOSStep2": "然后选择\"添加到主屏幕\""
+  "installIOSStep1Label": "第1步：",
+  "installIOSStep1": "点击底部的分享按钮",
+  "installIOSStep2Label": "第2步：",
+  "installIOSStep2": "点击\"添加到主屏幕\"",
+  "installGotIt": "知道了",
+  "installNotNow": "暂时不要"
 }

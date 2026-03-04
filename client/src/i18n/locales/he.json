@@ -114,9 +114,12 @@
   "phoneHint": "052...",
   "continueBtn": "המשך",
   "enterDetails": "הזינו את הפרטים",
-  "installTitle": "הוסף למסך הבית",
-  "installDesc": "התקן את מגן משפחה לגישה מהירה ותמיכה אופליין",
+  "installDesc": "הוסיפו למסך הבית לגישה מהירה בשעת חירום",
   "installBtn": "התקן",
-  "installIOSStep1": "לחצו על כפתור השיתוף",
-  "installIOSStep2": "ואז \"הוסף למסך הבית\""
+  "installIOSStep1Label": "שלב 1:",
+  "installIOSStep1": "לחצו על כפתור השיתוף בתחתית המסך",
+  "installIOSStep2Label": "שלב 2:",
+  "installIOSStep2": "לחצו על \"הוסף למסך הבית\"",
+  "installGotIt": "הבנתי",
+  "installNotNow": "לא עכשיו"
 }

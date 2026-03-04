@@ -114,9 +114,12 @@
     "ja": "日本語",
     "uk": "Українська"
   },
-  "installTitle": "افزودن به صفحه اصلی",
-  "installDesc": "سپر خانواده را برای دسترسی سریع و پشتیبانی آفلاین نصب کنید",
+  "installDesc": "برای دسترسی فوری در مواقع اضطراری به صفحه اصلی اضافه کنید",
   "installBtn": "نصب",
-  "installIOSStep1": "روی دکمه اشتراک‌گذاری بزنید",
-  "installIOSStep2": "سپس \"افزودن به صفحه اصلی\""
+  "installIOSStep1Label": "مرحله ۱:",
+  "installIOSStep1": "روی دکمه اشتراک‌گذاری در پایین بزنید",
+  "installIOSStep2Label": "مرحله ۲:",
+  "installIOSStep2": "روی \"افزودن به صفحه اصلی\" بزنید",
+  "installGotIt": "متوجه شدم",
+  "installNotNow": "الان نه"
 }

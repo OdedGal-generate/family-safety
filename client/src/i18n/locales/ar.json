@@ -114,9 +114,12 @@
   "phoneHint": "+972...",
   "continueBtn": "متابعة",
   "enterDetails": "أدخل بياناتك",
-  "installTitle": "أضف إلى الشاشة الرئيسية",
-  "installDesc": "ثبّت درع العائلة للوصول السريع والعمل بدون إنترنت",
+  "installDesc": "أضف إلى شاشتك الرئيسية للوصول الفوري أثناء الطوارئ",
   "installBtn": "تثبيت",
-  "installIOSStep1": "اضغط على زر المشاركة",
-  "installIOSStep2": "ثم \"إضافة إلى الشاشة الرئيسية\""
+  "installIOSStep1Label": "الخطوة 1:",
+  "installIOSStep1": "اضغط على زر المشاركة في الأسفل",
+  "installIOSStep2Label": "الخطوة 2:",
+  "installIOSStep2": "اضغط على \"إضافة إلى الشاشة الرئيسية\"",
+  "installGotIt": "فهمت",
+  "installNotNow": "ليس الآن"
 }

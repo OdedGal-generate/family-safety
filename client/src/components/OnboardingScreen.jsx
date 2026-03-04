@@ -4,8 +4,10 @@ import { useSendOtp, useVerifyOtp, useRegister, useCreateGroup } from "../api/ho
 import { saveAuth, saveGroupId } from "../api/client";
 import { subscribeToPush } from "../services/pushNotifications";
 
+const LANGUAGES = ["he", "en", "ar", "fr", "es", "ru", "fa", "zh", "ja", "uk"];
+
 export default function OnboardingScreen({ onCreateGroup, onJoinGroup }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [step, setStep] = useState("choice"); // "choice" | "phone" | "otp" | "details"
   const [phone, setPhone] = useState("");
   const [otpCode, setOtpCode] = useState("");
@@ -96,6 +98,23 @@ export default function OnboardingScreen({ onCreateGroup, onJoinGroup }) {
     <div className="min-h-screen bg-bg-primary flex flex-col items-center justify-center px-6 relative">
       {/* Glow effect */}
       <div className="fixed top-[-100px] left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(34,197,94,0.08)_0%,transparent_70%)] pointer-events-none z-0" />
+
+      {/* Language selector — top of screen */}
+      <div className="absolute top-4 z-10 flex gap-1 overflow-x-auto max-w-[320px] scrollbar-none px-2">
+        {LANGUAGES.map((lng) => (
+          <button
+            key={lng}
+            onClick={() => i18n.changeLanguage(lng)}
+            className={`px-2 py-1 rounded-md border-none cursor-pointer text-[11px] font-semibold transition-all shrink-0 ${
+              i18n.language === lng
+                ? "bg-green-active text-accent-green"
+                : "bg-[rgba(255,255,255,0.05)] text-text-secondary"
+            }`}
+          >
+            {lng.toUpperCase()}
+          </button>
+        ))}
+      </div>
 
       <div className="relative z-[1] w-full max-w-[340px] flex flex-col items-center">
         {/* Logo */}

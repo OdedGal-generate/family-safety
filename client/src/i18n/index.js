@@ -37,7 +37,7 @@ i18n
       ja: { translation: ja },
       uk: { translation: uk },
     },
-    fallbackLng: "he",
+    fallbackLng: "en",
     interpolation: {
       escapeValue: false,
     },
@@ -52,7 +52,7 @@ i18n.on("languageChanged", (lng) => {
 });
 
 // Apply initial direction
-applyDirection(i18n.language || "he");
+applyDirection(i18n.language || "en");
 
 export { RTL_LANGUAGES };
 export default i18n;

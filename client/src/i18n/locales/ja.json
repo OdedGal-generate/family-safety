@@ -113,5 +113,10 @@
     "zh": "中文",
     "ja": "日本語",
     "uk": "Українська"
-  }
+  },
+  "installTitle": "ホーム画面に追加",
+  "installDesc": "ファミリーシールドをインストールして素早くアクセス",
+  "installBtn": "インストール",
+  "installIOSStep1": "共有ボタンをタップ",
+  "installIOSStep2": "「ホーム画面に追加」を選択"
 }

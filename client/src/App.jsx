@@ -10,6 +10,7 @@ import SettingsScreen from "./components/SettingsScreen";
 import OnboardingScreen from "./components/OnboardingScreen";
 import JoinGroupScreen from "./components/JoinGroupScreen";
 import SubGroupsList from "./components/SubGroupsList";
+import InstallPrompt from "./components/InstallPrompt";
 import { useGroupStatus, usePostStatus } from "./api/hooks";
 import { isLoggedIn } from "./api/client";
 import { subscribeToPush } from "./services/pushNotifications";
@@ -169,6 +170,9 @@ function App() {
         open={inviteOpen}
         onClose={() => setInviteOpen(false)}
       />
+
+      {/* PWA Install Prompt */}
+      <InstallPrompt />
     </div>
   );
 }

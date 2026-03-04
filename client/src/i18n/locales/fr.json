@@ -113,5 +113,10 @@
   "rejected": "Refusé",
   "phoneHint": "+33...",
   "continueBtn": "Continuer",
-  "enterDetails": "Entrez vos coordonnées"
+  "enterDetails": "Entrez vos coordonnées",
+  "installTitle": "Ajouter à l'écran d'accueil",
+  "installDesc": "Installez Bouclier Familial pour un accès rapide et le mode hors ligne",
+  "installBtn": "Installer",
+  "installIOSStep1": "Appuyez sur le bouton Partager",
+  "installIOSStep2": "puis \"Sur l'écran d'accueil\""
 }

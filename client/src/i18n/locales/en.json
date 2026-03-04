@@ -113,5 +113,10 @@
   "rejected": "Rejected",
   "phoneHint": "+972...",
   "continueBtn": "Continue",
-  "enterDetails": "Enter Your Details"
+  "enterDetails": "Enter Your Details",
+  "installTitle": "Add to Home Screen",
+  "installDesc": "Install Family Shield for quick access and offline support",
+  "installBtn": "Install",
+  "installIOSStep1": "Tap the Share button",
+  "installIOSStep2": "then \"Add to Home Screen\""
 }

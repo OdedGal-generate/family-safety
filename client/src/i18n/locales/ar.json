@@ -113,5 +113,10 @@
   "rejected": "مرفوض",
   "phoneHint": "+972...",
   "continueBtn": "متابعة",
-  "enterDetails": "أدخل بياناتك"
+  "enterDetails": "أدخل بياناتك",
+  "installTitle": "أضف إلى الشاشة الرئيسية",
+  "installDesc": "ثبّت درع العائلة للوصول السريع والعمل بدون إنترنت",
+  "installBtn": "تثبيت",
+  "installIOSStep1": "اضغط على زر المشاركة",
+  "installIOSStep2": "ثم \"إضافة إلى الشاشة الرئيسية\""
 }

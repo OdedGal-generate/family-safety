@@ -113,5 +113,10 @@
     "zh": "中文",
     "ja": "日本語",
     "uk": "Українська"
-  }
+  },
+  "installTitle": "Agregar a pantalla de inicio",
+  "installDesc": "Instala Escudo Familiar para acceso rápido y soporte sin conexión",
+  "installBtn": "Instalar",
+  "installIOSStep1": "Toca el botón Compartir",
+  "installIOSStep2": "luego \"Agregar a inicio\""
 }

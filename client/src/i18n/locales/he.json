@@ -113,5 +113,10 @@
   "rejected": "נדחה",
   "phoneHint": "052...",
   "continueBtn": "המשך",
-  "enterDetails": "הזינו את הפרטים"
+  "enterDetails": "הזינו את הפרטים",
+  "installTitle": "הוסף למסך הבית",
+  "installDesc": "התקן את מגן משפחה לגישה מהירה ותמיכה אופליין",
+  "installBtn": "התקן",
+  "installIOSStep1": "לחצו על כפתור השיתוף",
+  "installIOSStep2": "ואז \"הוסף למסך הבית\""
 }

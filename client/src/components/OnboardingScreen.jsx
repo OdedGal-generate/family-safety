@@ -80,13 +80,13 @@ export default function OnboardingScreen({ onCreateGroup, onJoinGroup }) {
       {/* Glow effect */}
       <div className="fixed top-[-100px] left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(34,197,94,0.08)_0%,transparent_70%)] pointer-events-none z-0" />
 
-      {/* Language selector — top of screen */}
-      <div className="absolute top-4 z-10 flex gap-1 overflow-x-auto max-w-[320px] scrollbar-none px-2">
+      {/* Language selector — 2-row grid at top of screen */}
+      <div className="absolute top-3 z-10 grid grid-cols-5 gap-1.5 px-4 w-full max-w-[320px]">
         {LANGUAGES.map((lng) => (
           <button
             key={lng}
             onClick={() => i18n.changeLanguage(lng)}
-            className={`px-2 py-1 rounded-md border-none cursor-pointer text-[11px] font-semibold transition-all shrink-0 ${
+            className={`py-1.5 rounded-md border-none cursor-pointer text-[11px] font-semibold transition-all ${
               i18n.language === lng
                 ? "bg-green-active text-accent-green"
                 : "bg-[rgba(255,255,255,0.05)] text-text-secondary"

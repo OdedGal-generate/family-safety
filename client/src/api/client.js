@@ -4,8 +4,16 @@ const TOKEN_KEY = "familyShield_token";
 const USER_KEY = "familyShield_user";
 const GROUP_KEY = "familyShield_groupId";
 
+// Resolve API base URL — auto-append /api if the env var doesn't include it
+let resolvedBaseURL = import.meta.env.VITE_API_URL || "/api";
+if (resolvedBaseURL !== "/api" && !resolvedBaseURL.endsWith("/api")) {
+  resolvedBaseURL = resolvedBaseURL.replace(/\/+$/, "") + "/api";
+}
+
+console.log("[API] baseURL:", resolvedBaseURL);
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "/api",
+  baseURL: resolvedBaseURL,
   headers: { "Content-Type": "application/json" },
 });
 

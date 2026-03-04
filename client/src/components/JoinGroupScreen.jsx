@@ -1,0 +1,344 @@
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { useSendOtp, useVerifyOtp, useRegister, useJoinGroup } from "../api/hooks";
+import { saveAuth } from "../api/client";
+import { subscribeToPush } from "../services/pushNotifications";
+
+export default function JoinGroupScreen({ onBack, onJoined }) {
+  const { t } = useTranslation();
+  const [step, setStep] = useState("code"); // "code" | "phone" | "otp" | "form" | "pending"
+  const [code, setCode] = useState("");
+  const [phone, setPhone] = useState("");
+  const [otpCode, setOtpCode] = useState("");
+  const [name, setName] = useState("");
+  const [role, setRole] = useState("");
+  const [showQRPlaceholder, setShowQRPlaceholder] = useState(false);
+  const [error, setError] = useState("");
+  const [countdown, setCountdown] = useState(0);
+
+  const sendOtp = useSendOtp();
+  const verifyOtp = useVerifyOtp();
+  const register = useRegister();
+  const joinGroup = useJoinGroup();
+
+  // Resend countdown timer
+  useEffect(() => {
+    if (countdown <= 0) return;
+    const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [countdown]);
+
+  // Auto-format code with dash after 3 digits
+  const handleCodeChange = (e) => {
+    let raw = e.target.value.replace(/[^0-9]/g, "").slice(0, 6);
+    if (raw.length > 3) {
+      raw = raw.slice(0, 3) + "-" + raw.slice(3);
+    }
+    setCode(raw);
+  };
+
+  const codeDigits = code.replace("-", "").length;
+
+  const handleSendCode = async () => {
+    if (!phone.trim()) return;
+    setError("");
+    try {
+      await sendOtp.mutateAsync({ phone: phone.trim() });
+      setCountdown(60);
+      setStep("otp");
+    } catch (err) {
+      setError(err.response?.data?.error || err.message);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (otpCode.length !== 6) return;
+    setError("");
+    try {
+      const data = await verifyOtp.mutateAsync({ phone: phone.trim(), code: otpCode });
+      saveAuth(data.token, data.user);
+      subscribeToPush().catch(() => {});
+      setStep("form");
+    } catch (err) {
+      setError(err.response?.data?.error || t("invalidOtp"));
+    }
+  };
+
+  const handleResend = async () => {
+    if (countdown > 0) return;
+    setError("");
+    try {
+      await sendOtp.mutateAsync({ phone: phone.trim() });
+      setCountdown(60);
+      setOtpCode("");
+    } catch (err) {
+      setError(err.response?.data?.error || err.message);
+    }
+  };
+
+  const handleSubmitForm = async (e) => {
+    e.preventDefault();
+    if (!name || !role) return;
+    setError("");
+    try {
+      // Update profile name
+      const authData = await register.mutateAsync({ name: name.trim() });
+      saveAuth(authData.token, authData.user);
+
+      // Submit join request
+      await joinGroup.mutateAsync({
+        code,
+        display_name: name.trim(),
+        phone: phone.trim(),
+        self_description: role,
+      });
+
+      setStep("pending");
+    } catch (err) {
+      setError(err.response?.data?.error || err.message);
+    }
+  };
+
+  const loading = sendOtp.isPending || verifyOtp.isPending || register.isPending || joinGroup.isPending;
+
+  const inputClass =
+    "w-full py-3 px-3.5 rounded-xl bg-[rgba(255,255,255,0.04)] border border-border-subtle text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-green-border transition-all";
+  const greenBtnClass =
+    "w-full py-3.5 rounded-xl border-none cursor-pointer font-bold text-sm bg-gradient-to-r from-accent-green to-accent-green-dark text-white shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_30px_rgba(34,197,94,0.45)] transition-all";
+  const disabledBtnClass =
+    "w-full py-3.5 rounded-xl border-none cursor-not-allowed font-bold text-sm bg-[rgba(255,255,255,0.06)] text-text-muted transition-all";
+
+  const backStep = () => {
+    setError("");
+    if (step === "phone") setStep("code");
+    else if (step === "otp") { setStep("phone"); setOtpCode(""); }
+    else if (step === "form") setStep("otp");
+    else onBack();
+  };
+
+  return (
+    <div className="min-h-screen bg-bg-primary flex flex-col">
+      {/* Header */}
+      <div className="px-5 pt-4 pb-3 bg-[rgba(255,255,255,0.03)] backdrop-blur-[20px] border-b border-border-light flex items-center gap-3">
+        <button
+          onClick={backStep}
+          className="w-9 h-9 rounded-[10px] bg-[rgba(255,255,255,0.05)] border-none cursor-pointer text-text-secondary text-base flex items-center justify-center hover:bg-[rgba(255,255,255,0.1)] transition-all"
+        >
+          ←
+        </button>
+        <div className="text-[15px] font-bold">{t("joinGroup")}</div>
+      </div>
+
+      <div className="flex-1 p-5">
+        {/* Step 1: Enter invite code */}
+        {step === "code" && (
+          <div className="flex flex-col gap-5">
+            <div className="text-center pt-4">
+              <div className="text-xl mb-2">🔑</div>
+              <div className="text-[15px] font-bold text-text-primary mb-1">
+                {t("enterInviteCode")}
+              </div>
+              <div className="text-[12px] text-text-secondary mb-5">
+                {t("codeHint")}
+              </div>
+
+              <input
+                type="text"
+                inputMode="numeric"
+                value={code}
+                onChange={handleCodeChange}
+                placeholder="000-000"
+                className="w-full max-w-[200px] mx-auto block text-center text-[28px] font-extrabold tracking-[6px] font-mono bg-[rgba(255,255,255,0.04)] border border-border-subtle rounded-xl py-3 px-4 text-accent-green placeholder:text-text-muted focus:outline-none focus:border-green-border transition-all"
+              />
+            </div>
+
+            <button
+              onClick={() => setShowQRPlaceholder(!showQRPlaceholder)}
+              className="w-full py-3.5 rounded-xl border border-border-subtle bg-[rgba(255,255,255,0.04)] cursor-pointer text-sm font-semibold text-text-primary hover:bg-[rgba(255,255,255,0.07)] transition-all"
+            >
+              {t("scanQR")}
+            </button>
+
+            {showQRPlaceholder && (
+              <div className="flex items-center justify-center py-10 px-4 rounded-xl border border-border-subtle bg-[rgba(255,255,255,0.02)]">
+                <div className="text-center">
+                  <div className="text-3xl mb-2">📷</div>
+                  <div className="text-[13px] text-text-secondary">
+                    {t("scanQRPlaceholder")}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <button
+              onClick={() => setStep("phone")}
+              disabled={codeDigits < 6}
+              className={codeDigits >= 6 ? greenBtnClass : disabledBtnClass}
+            >
+              {t("next")}
+            </button>
+          </div>
+        )}
+
+        {/* Step 2: Phone number */}
+        {step === "phone" && (
+          <div className="flex flex-col gap-4 pt-4">
+            <div className="text-center mb-2">
+              <div className="text-xl mb-1">📱</div>
+              <div className="text-[13px] text-text-secondary">
+                {t("enterPhone")}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[12px] text-text-secondary font-semibold mb-1.5">
+                {t("phoneNumber")}
+              </label>
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder={t("phoneHint")}
+                autoFocus
+                className={inputClass}
+              />
+            </div>
+
+            {error && (
+              <div className="text-accent-red text-[12px] text-center">{error}</div>
+            )}
+
+            <button
+              onClick={handleSendCode}
+              disabled={!phone.trim() || loading}
+              className={phone.trim() && !loading ? greenBtnClass : disabledBtnClass}
+            >
+              {loading ? "⏳" : t("sendCode")}
+            </button>
+          </div>
+        )}
+
+        {/* Step 3: OTP verification */}
+        {step === "otp" && (
+          <div className="flex flex-col gap-4 pt-4">
+            <div className="text-center mb-2">
+              <div className="text-xl mb-1">🔐</div>
+              <div className="text-[13px] text-text-secondary">
+                {t("enterOtp")}
+              </div>
+              <div className="text-[11px] text-text-muted mt-1">
+                {t("otpHint")}
+              </div>
+            </div>
+
+            <input
+              type="text"
+              inputMode="numeric"
+              value={otpCode}
+              onChange={(e) => setOtpCode(e.target.value.replace(/[^0-9]/g, "").slice(0, 6))}
+              placeholder="000000"
+              autoFocus
+              className="w-full max-w-[200px] mx-auto block text-center text-[28px] font-extrabold tracking-[6px] font-mono bg-[rgba(255,255,255,0.04)] border border-border-subtle rounded-xl py-3 px-4 text-accent-green placeholder:text-text-muted focus:outline-none focus:border-green-border transition-all"
+            />
+
+            {error && (
+              <div className="text-accent-red text-[12px] text-center">{error}</div>
+            )}
+
+            <button
+              onClick={handleVerifyOtp}
+              disabled={otpCode.length !== 6 || loading}
+              className={otpCode.length === 6 && !loading ? greenBtnClass : disabledBtnClass}
+            >
+              {loading ? "⏳" : t("verifyCode")}
+            </button>
+
+            <button
+              onClick={handleResend}
+              disabled={countdown > 0 || loading}
+              className="w-full py-3 rounded-xl border-none cursor-pointer text-sm font-semibold text-text-secondary bg-transparent hover:text-text-primary transition-all disabled:opacity-50"
+            >
+              {countdown > 0
+                ? t("resendIn", { n: countdown })
+                : t("resendCode")}
+            </button>
+          </div>
+        )}
+
+        {/* Step 4: Fill form (name + role only, phone already captured) */}
+        {step === "form" && (
+          <form onSubmit={handleSubmitForm} className="flex flex-col gap-3.5 pt-2">
+            <div className="text-center py-2.5 px-4 rounded-xl bg-[rgba(34,197,94,0.08)] border border-green-border mb-1">
+              <span className="text-[11px] text-text-secondary font-semibold">
+                {t("inviteCode")}:
+              </span>{" "}
+              <span className="text-accent-green font-bold font-mono tracking-wider">
+                {code}
+              </span>
+            </div>
+
+            <div>
+              <label className="block text-[12px] text-text-secondary font-semibold mb-1.5">
+                {t("fullName")}
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                autoFocus
+                className={inputClass}
+              />
+            </div>
+
+            <div>
+              <label className="block text-[12px] text-text-secondary font-semibold mb-1.5">
+                {t("roleInGroup")}
+              </label>
+              <input
+                type="text"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                required
+                className={inputClass}
+              />
+            </div>
+
+            {error && (
+              <div className="text-accent-red text-[12px] text-center">{error}</div>
+            )}
+
+            <button
+              type="submit"
+              disabled={!name || !role || loading}
+              className={`mt-2 ${name && role && !loading ? greenBtnClass : disabledBtnClass}`}
+            >
+              {loading ? "⏳" : t("submit")}
+            </button>
+          </form>
+        )}
+
+        {/* Step 5: Pending approval */}
+        {step === "pending" && (
+          <div className="flex flex-col items-center justify-center text-center pt-16 gap-4">
+            <div className="w-20 h-20 rounded-full bg-yellow-bg border border-yellow-border flex items-center justify-center text-4xl">
+              ⏳
+            </div>
+            <div className="text-xl font-bold text-accent-yellow">
+              {t("pendingApproval")}
+            </div>
+            <div className="text-[13px] text-text-secondary leading-relaxed max-w-[280px]">
+              {t("pendingApprovalDesc")}
+            </div>
+            <button
+              onClick={onJoined}
+              className="mt-4 py-3 px-8 rounded-xl bg-[rgba(255,255,255,0.06)] border-none cursor-pointer text-sm font-semibold text-text-primary hover:bg-[rgba(255,255,255,0.1)] transition-all"
+            >
+              {t("backToHome")}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

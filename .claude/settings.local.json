@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(npx vite build)",
+      "Bash(timeout 3 node index.js)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(ls /c/family-safety/client/node_modules/.bin/vite*)",
+      "Bash(node -e \"console.log\\(require.resolve\\(''vite/bin/vite.js'', {paths: [''/c/family-safety/client'']}\\)\\)\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/)",
+      "Bash(npm install qrcode.react)",
+      "Bash(npm install jsonwebtoken express-validator uuid)",
+      "Bash(node -e \":*)",
+      "Bash(pkill -f \"node.*index.js\")",
+      "Bash(pkill -f \"node.*server\")",
+      "Bash(taskkill //F //IM node.exe)",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc3MjYxNTQ3NSwiZXhwIjoxNzc1MjA3NDc1fQ.u9m5Xz6YKemvXKB7inY18HAf4wbxQsjhse4HbBY1vi0\")",
+      "Bash(curl -s -X POST http://localhost:3000/api/status -H \"Content-Type: application/json\" -H \"Authorization: Bearer $TOKEN\" -d \"{\"\"group_id\"\":1,\"\"status\"\":\"\"safe\"\",\"\"lat\"\":32.07,\"\"lng\"\":34.82,\"\"address\"\":\"\"רמת גן\"\"}\")",
+      "Bash(curl -s -X POST http://localhost:3000/api/groups/1/invite -H \"Authorization: Bearer $TOKEN\")",
+      "Bash(curl -s -X PATCH http://localhost:3000/api/groups/1/requests/1 -H \"Content-Type: application/json\" -H \"Authorization: Bearer $TOKEN\" -d \"{\"\"status\"\":\"\"approved\"\"}\")",
+      "Bash(curl -s http://localhost:3000/api/groups/1/requests)",
+      "Bash(npm install axios @tanstack/react-query)",
+      "Bash(npm ls react)",
+      "Bash(npm install twilio web-push)",
+      "Bash(npx web-push generate-vapid-keys --json)",
+      "Bash(netstat -ano)",
+      "Bash(curl -s http://localhost:5173/)",
+      "Bash(curl -s -X POST http://localhost:5173/api/auth/send-otp -H \"Content-Type: application/json\" -d '{\"\"phone\"\": \"\"+972501111111\"\"}')",
+      "Bash(npm run build)",
+      "Bash(git init)",
+      "Bash(git add -A)"
+    ]
+  }
+}

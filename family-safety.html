@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מגן משפחה</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Heebo', 'Segoe UI', sans-serif;
+    background: #0a0f1e;
+    color: #e8edf5;
+    min-height: 100vh;
+    max-width: 420px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .glow {
+    position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 600px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(34,197,94,0.08) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+  /* HEADER */
+  .header {
+    padding: 16px 20px 12px;
+    background: rgba(255,255,255,0.03);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { display: flex; align-items: center; gap: 10; }
+  .logo-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; box-shadow: 0 0 20px rgba(34,197,94,0.4);
+  }
+  .logo-name { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
+  .logo-sub { font-size: 11px; color: #64748b; }
+  .lang-switcher { display: flex; gap: 4px; }
+  .lang-btn {
+    padding: 4px 8px; border-radius: 6px; border: none; cursor: pointer;
+    font-size: 11px; font-weight: 600;
+    background: rgba(255,255,255,0.05); color: #64748b;
+    transition: all 0.2s; font-family: inherit;
+  }
+  .lang-btn.active { background: rgba(34,197,94,0.2); color: #22c55e; }
+  /* CONTENT */
+  .content { padding: 0 0 80px; position: relative; z-index: 1; }
+  /* STATUS BANNER */
+  .status-banner {
+    margin: 16px 16px 0; padding: 12px 16px; border-radius: 14px;
+    background: linear-gradient(135deg, rgba(234,179,8,0.15), rgba(202,138,4,0.1));
+    border: 1px solid rgba(234,179,8,0.3);
+    display: flex; align-items: center; justify-content: space-between;
+    transition: all 0.5s;
+  }
+  .status-banner.all-safe {
+    background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(16,163,74,0.1));
+    border-color: rgba(34,197,94,0.3);
+  }
+  .status-title { font-size: 13px; font-weight: 700; color: #eab308; }
+  .status-banner.all-safe .status-title { color: #22c55e; }
+  .status-sub { font-size: 11px; color: #64748b; margin-top: 2px; }
+  .status-icon { font-size: 28px; }
+  /* BUTTONS AREA */
+  .buttons-area { padding: 20px 16px 8px; }
+  .btn-safe-main {
+    width: 100%; padding: 22px 20px; border-radius: 20px; border: none;
+    cursor: pointer;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white; font-size: 22px; font-weight: 800; letter-spacing: -0.5px;
+    box-shadow: 0 0 30px rgba(34,197,94,0.4), 0 8px 24px rgba(0,0,0,0.3);
+    transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;
+    font-family: inherit;
+  }
+  .btn-safe-main:active { transform: scale(0.97); }
+  .btn-safe-main.sent {
+    background: linear-gradient(135deg, #16a34a, #15803d);
+    box-shadow: 0 0 40px rgba(34,197,94,0.6), 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .btn-safe-small {
+    width: 100%; margin-top: 8px; padding: 13px 20px; border-radius: 14px;
+    border: 1px solid rgba(34,197,94,0.3); cursor: pointer;
+    background: rgba(34,197,94,0.06); color: #22c55e;
+    font-size: 15px; font-weight: 600; transition: all 0.2s; font-family: inherit;
+  }
+  .btn-sos {
+    width: 100%; margin-top: 8px; padding: 13px 20px; border-radius: 14px;
+    border: 1px solid rgba(239,68,68,0.3); cursor: pointer;
+    background: rgba(239,68,68,0.06); color: #ef4444;
+    font-size: 15px; font-weight: 700; transition: all 0.2s; font-family: inherit;
+  }
+  /* SECTION LABEL */
+  .section-label { font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 10px; }
+  /* MEMBER LIST */
+  .members-area { padding: 8px 16px 0; }
+  .member-card {
+    padding: 12px 14px; border-radius: 14px; margin-bottom: 8px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; gap: 12;
+    transition: all 0.3s;
+  }
+  .member-card.safe { border-color: rgba(34,197,94,0.15); }
+  .member-card.sos { border-color: rgba(239,68,68,0.3); }
+  .member-emoji { font-size: 26px; flex-shrink: 0; }
+  .member-info { flex: 1; }
+  .member-name { font-size: 14px; font-weight: 600; }
+  .member-role { font-size: 11px; color: #64748b; }
+  .member-status { text-align: left; }
+  [dir="rtl"] .member-status { text-align: right; }
+  .status-label { font-size: 12px; font-weight: 700; }
+  .status-label.safe { color: #22c55e; }
+  .status-label.sos { color: #ef4444; }
+  .status-label.pending { color: #94a3b8; }
+  .status-time { font-size: 10px; color: #475569; }
+  /* SUBGROUPS */
+  .subgroups-area { padding: 16px 16px 0; }
+  .subgroup-card {
+    padding: 12px 14px; border-radius: 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; gap: 12px; margin-bottom: 8px;
+  }
+  .subgroup-emoji { font-size: 22px; }
+  .subgroup-info { flex: 1; }
+  .subgroup-name { font-size: 13px; font-weight: 600; }
+  .subgroup-count { font-size: 11px; color: #64748b; }
+  .subgroup-safe { font-size: 13px; font-weight: 700; }
+  .btn-invite {
+    width: 100%; padding: 12px; border-radius: 14px;
+    border: 1px dashed rgba(255,255,255,0.15);
+    background: transparent; color: #64748b;
+    font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit;
+  }
+  /* CHECKLIST */
+  .checklist-area { padding: 16px; }
+  .checklist-header {
+    padding: 14px 16px; border-radius: 14px; margin-bottom: 16px;
+    background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(37,99,235,0.1));
+    border: 1px solid rgba(59,130,246,0.2);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .checklist-title { font-size: 14px; font-weight: 700; color: #60a5fa; }
+  .checklist-sub { font-size: 11px; color: #64748b; margin-top: 2px; }
+  .checklist-pct {
+    width: 48px; height: 48px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: #60a5fa;
+    border: 3px solid rgba(59,130,246,0.3);
+  }
+  .check-item {
+    padding: 13px 14px; border-radius: 12px; margin-bottom: 6px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; gap: 12px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .check-item.checked {
+    background: rgba(34,197,94,0.07);
+    border-color: rgba(34,197,94,0.2); opacity: 0.7;
+  }
+  .check-box {
+    width: 22px; height: 22px; border-radius: 6px;
+    border: 2px solid rgba(255,255,255,0.2);
+    background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; flex-shrink: 0; transition: all 0.2s; color: white;
+  }
+  .check-item.checked .check-box {
+    border-color: #22c55e; background: #22c55e;
+  }
+  .check-text { flex: 1; font-size: 14px; color: #e2e8f0; }
+  .check-item.checked .check-text { text-decoration: line-through; color: #64748b; }
+  .check-cat {
+    font-size: 10px; padding: 2px 7px; border-radius: 6px;
+    background: rgba(255,255,255,0.05); color: #64748b;
+  }
+  /* SETTINGS */
+  .settings-area { padding: 16px; }
+  .setting-card {
+    padding: 14px 16px; border-radius: 14px; margin-bottom: 8px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .setting-icon { font-size: 20px; }
+  .setting-label { flex: 1; font-size: 14px; }
+  .setting-val { font-size: 13px; font-weight: 600; }
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 420px;
+    background: rgba(10,15,30,0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255,255,255,0.07);
+    display: flex; z-index: 100;
+  }
+  .nav-btn {
+    flex: 1; padding: 12px 8px; border: none; background: transparent;
+    cursor: pointer; display: flex; flex-direction: column;
+    align-items: center; gap: 3px; color: #475569; transition: all 0.2s;
+    font-family: inherit;
+  }
+  .nav-btn.active { color: #22c55e; }
+  .nav-icon { font-size: 20px; }
+  .nav-label { font-size: 10px; font-weight: 600; }
+  /* MODAL OVERLAY */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(10px); z-index: 200;
+    display: none; align-items: flex-end; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-sheet {
+    width: 100%; max-width: 420px;
+    background: #111827; border-radius: 24px 24px 0 0;
+    padding: 24px 20px 40px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .modal-handle {
+    width: 36px; height: 4px; border-radius: 2px;
+    background: rgba(255,255,255,0.15); margin: 0 auto 20px;
+  }
+  .modal-title { font-size: 17px; font-weight: 700; margin-bottom: 20px; }
+  .invite-code {
+    padding: 20px; border-radius: 16px;
+    background: rgba(34,197,94,0.08);
+    border: 1px solid rgba(34,197,94,0.2);
+    text-align: center; margin-bottom: 16px;
+  }
+  .invite-number { font-size: 48px; letter-spacing: 8px; font-weight: 800; color: #22c55e; }
+  .invite-validity { font-size: 12px; color: #64748b; margin-top: 6px; }
+  .invite-btns { display: flex; gap: 8px; }
+  .btn-whatsapp {
+    flex: 1; padding: 14px; border-radius: 12px; border: none;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  .btn-qr {
+    flex: 1; padding: 14px; border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+    color: #e2e8f0; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  /* SOS MODAL */
+  .sos-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(10px); z-index: 200;
+    display: none; align-items: center; justify-content: center; padding: 20px;
+  }
+  .sos-overlay.open { display: flex; }
+  .sos-modal {
+    width: 100%; max-width: 380px;
+    background: #1a0a0a; border-radius: 24px; padding: 32px 24px;
+    border: 1px solid rgba(239,68,68,0.3);
+    box-shadow: 0 0 60px rgba(239,68,68,0.2);
+    text-align: center;
+  }
+  .sos-icon { font-size: 56px; margin-bottom: 12px; }
+  .sos-title { font-size: 20px; font-weight: 800; color: #ef4444; margin-bottom: 8px; }
+  .sos-desc { font-size: 13px; color: #94a3b8; margin-bottom: 28px; }
+  .btn-sos-confirm {
+    width: 100%; padding: 16px; border-radius: 14px; border: none;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white; font-size: 16px; font-weight: 800; cursor: pointer;
+    margin-bottom: 10px; font-family: inherit;
+    box-shadow: 0 0 30px rgba(239,68,68,0.4);
+  }
+  .btn-cancel {
+    width: 100%; padding: 14px; border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: transparent; color: #64748b;
+    font-size: 14px; cursor: pointer; font-family: inherit;
+  }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="glow"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">🛡️</div>
+    <div>
+      <div class="logo-name" id="appName">מגן משפחה</div>
+      <div class="logo-sub" id="tagline">ביחד, בטוחים</div>
+    </div>
+  </div>
+  <div class="lang-switcher">
+    <button class="lang-btn active" onclick="setLang('he')">HE</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('ar')">AR</button>
+    <button class="lang-btn" onclick="setLang('fr')">FR</button>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- HOME TAB -->
+  <div id="tab-home">
+    <div class="status-banner" id="statusBanner">
+      <div>
+        <div class="status-title" id="statusTitle">ממתין לדיווח...</div>
+        <div class="status-sub" id="statusSub">5 מתוך 6 בטוחים</div>
+      </div>
+      <div class="status-icon" id="statusIcon">🟡</div>
+    </div>
+
+    <div class="buttons-area">
+      <button class="btn-safe-main" id="btnSafeMain" onclick="handleSafe(true)">
+        <span id="btnMainIcon">🟢</span>
+        <span id="btnMainText">אני בטוח + מיקום</span>
+      </button>
+      <button class="btn-safe-small" onclick="handleSafe(false)">
+        <span id="btnSmallText">✅ אני בטוח</span>
+      </button>
+      <button class="btn-sos" onclick="document.getElementById('sosOverlay').classList.add('open')">
+        <span id="btnSosText">🆘 SOS חירום</span>
+      </button>
+    </div>
+
+    <div class="members-area">
+      <div class="section-label" id="familyLabel">המשפחה שלי</div>
+      <div id="membersList"></div>
+    </div>
+
+    <div class="subgroups-area">
+      <div class="section-label" id="groupsLabel">קבוצות משפחה</div>
+      <div id="subgroupsList"></div>
+      <button class="btn-invite" onclick="document.getElementById('inviteOverlay').classList.add('open')">
+        <span id="inviteBtn">+ הזמן בני משפחה</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- CHECKLIST TAB -->
+  <div id="tab-checklist" class="hidden checklist-area">
+    <div class="checklist-header">
+      <div>
+        <div class="checklist-title">🏠 <span id="shelterLabel">ממד</span></div>
+        <div class="checklist-sub" id="checklistSub">0/10</div>
+      </div>
+      <div class="checklist-pct" id="checklistPct">0%</div>
+    </div>
+    <div id="checklistItems"></div>
+  </div>
+
+  <!-- SETTINGS TAB -->
+  <div id="tab-settings" class="hidden settings-area">
+    <div class="section-label" id="settingsLabel">הגדרות</div>
+    <div id="settingsList"></div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="nav-btn active" id="nav-home" onclick="setTab('home')">
+    <div class="nav-icon">🏠</div>
+    <div class="nav-label" id="navHome">דשבורד</div>
+  </button>
+  <button class="nav-btn" id="nav-checklist" onclick="setTab('checklist')">
+    <div class="nav-icon">✅</div>
+    <div class="nav-label" id="navChecklist">צ׳קליסט ממד</div>
+  </button>
+  <button class="nav-btn" id="nav-settings" onclick="setTab('settings')">
+    <div class="nav-icon">⚙️</div>
+    <div class="nav-label" id="navSettings">הגדרות</div>
+  </button>
+</div>
+
+<!-- INVITE MODAL -->
+<div class="modal-overlay" id="inviteOverlay" onclick="this.classList.remove('open')">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="inviteTitle">הזמן בני משפחה</div>
+    <div class="invite-code">
+      <div class="invite-number">847-293</div>
+      <div class="invite-validity" id="inviteValidity">תוקף: 24 שעות</div>
+    </div>
+    <div class="invite-btns">
+      <button class="btn-whatsapp">📱 WhatsApp</button>
+      <button class="btn-qr">📷 QR Code</button>
+    </div>
+  </div>
+</div>
+
+<!-- SOS MODAL -->
+<div class="sos-overlay" id="sosOverlay">
+  <div class="sos-modal">
+    <div class="sos-icon">🆘</div>
+    <div class="sos-title" id="sosTitle">SOS חירום</div>
+    <div class="sos-desc" id="sosDesc">כל בני המשפחה יקבלו התראת חירום מיידית</div>
+    <button class="btn-sos-confirm" id="sosConfirmBtn" onclick="sendSOS()">🆘 שלח SOS לכולם</button>
+    <button class="btn-cancel" id="sosCancelBtn" onclick="document.getElementById('sosOverlay').classList.remove('open')">ביטול</button>
+  </div>
+</div>
+
+<script>
+const i18n = {
+  he: {
+    dir: "rtl", appName: "מגן משפחה", tagline: "ביחד, בטוחים",
+    iAmSafe: "אני בטוח", iAmSafeWith: "אני בטוח + מיקום", sos: "SOS חירום",
+    dashboard: "דשבורד", family: "המשפחה שלי", checklist: "צ׳קליסט ממד", settings: "הגדרות",
+    allSafe: "כולם בטוחים ✓", waitingFor: "ממתין לדיווח...",
+    justNow: "עכשיו", minutesAgo: "לפני {n} דק׳", hoursAgo: "לפני {n} שע׳",
+    safeStatus: "בטוח ✅", sosStatus: "SOS 🆘", pendingStatus: "לא דיווח ⏳",
+    inviteFamily: "הזמן בני משפחה", members: "חברים",
+    familyGroups: "קבוצות משפחה", totalSafe: "בטוחים", of: "מתוך",
+    shelter: "ממד", inviteValidity: "תוקף: 24 שעות",
+    sendingSafe: "שולח...", sent: "נשלח! ✅",
+    sosTitle: "SOS חירום", sosDesc: "כל בני המשפחה יקבלו התראת חירום מיידית",
+    sosSend: "🆘 שלח SOS לכולם", cancel: "ביטול",
+    settingsItems: [
+      { icon: "📍", label: "שיתוף מיקום", value: "פעיל", color: "#22c55e" },
+      { icon: "🔔", label: "התראות", value: "פעיל", color: "#22c55e" },
+      { icon: "🌐", label: "שפה", value: "עברית", color: "#60a5fa" },
+      { icon: "👥", label: "הגדרות קבוצה", value: "›", color: "#94a3b8" },
+      { icon: "🔐", label: "אישור כניסה", value: "ידני", color: "#f59e0b" },
+    ],
+    checklistItems: [
+      { id:1, text:"מים (3 ליטר לאדם)", cat:"מזון" },
+      { id:2, text:"מזון שמור", cat:"מזון" },
+      { id:3, text:"רדיו ממונע סוללות", cat:"ציוד" },
+      { id:4, text:"פנס + סוללות", cat:"ציוד" },
+      { id:5, text:"תרופות קבועות", cat:"רפואה" },
+      { id:6, text:"ערכת עזרה ראשונה", cat:"רפואה" },
+      { id:7, text:"מסמכים (ת.ז, דרכון)", cat:"מסמכים" },
+      { id:8, text:"כסף מזומן", cat:"מסמכים" },
+      { id:9, text:"מטען נייד", cat:"ציוד" },
+      { id:10, text:"אוכל לחיות מחמד", cat:"חיות" },
+    ],
+  },
+  en: {
+    dir: "ltr", appName: "Family Shield", tagline: "Together, Safe",
+    iAmSafe: "I'm Safe", iAmSafeWith: "I'm Safe + Location", sos: "SOS Emergency",
+    dashboard: "Dashboard", family: "My Family", checklist: "Shelter Checklist", settings: "Settings",
+    allSafe: "Everyone is Safe ✓", waitingFor: "Waiting for reports...",
+    justNow: "Just now", minutesAgo: "{n} min ago", hoursAgo: "{n}h ago",
+    safeStatus: "Safe ✅", sosStatus: "SOS 🆘", pendingStatus: "No report ⏳",
+    inviteFamily: "Invite Family", members: "members",
+    familyGroups: "Family Groups", totalSafe: "safe", of: "of",
+    shelter: "Shelter", inviteValidity: "Valid: 24 hours",
+    sendingSafe: "Sending...", sent: "Sent! ✅",
+    sosTitle: "SOS Emergency", sosDesc: "All family members will receive an emergency alert",
+    sosSend: "🆘 Send SOS to Everyone", cancel: "Cancel",
+    settingsItems: [
+      { icon: "📍", label: "Location Sharing", value: "Active", color: "#22c55e" },
+      { icon: "🔔", label: "Notifications", value: "Active", color: "#22c55e" },
+      { icon: "🌐", label: "Language", value: "English", color: "#60a5fa" },
+      { icon: "👥", label: "Group Settings", value: "›", color: "#94a3b8" },
+      { icon: "🔐", label: "Join Approval", value: "Manual", color: "#f59e0b" },
+    ],
+    checklistItems: [
+      { id:1, text:"Water (3L per person)", cat:"Food" },
+      { id:2, text:"Canned food", cat:"Food" },
+      { id:3, text:"Battery radio", cat:"Equipment" },
+      { id:4, text:"Flashlight + batteries", cat:"Equipment" },
+      { id:5, text:"Prescription medications", cat:"Medical" },
+      { id:6, text:"First aid kit", cat:"Medical" },
+      { id:7, text:"ID documents, passport", cat:"Documents" },
+      { id:8, text:"Cash", cat:"Documents" },
+      { id:9, text:"Power bank", cat:"Equipment" },
+      { id:10, text:"Pet food", cat:"Pets" },
+    ],
+  },
+  ar: {
+    dir: "rtl", appName: "درع العائلة", tagline: "معًا، بأمان",
+    iAmSafe: "أنا بأمان", iAmSafeWith: "أنا بأمان + الموقع", sos: "SOS طوارئ",
+    dashboard: "لوحة التحكم", family: "عائلتي", checklist: "قائمة الملجأ", settings: "الإعدادات",
+    allSafe: "الجميع بأمان ✓", waitingFor: "في انتظار التقارير...",
+    justNow: "الآن", minutesAgo: "منذ {n} دقيقة", hoursAgo: "منذ {n} ساعة",
+    safeStatus: "بأمان ✅", sosStatus: "SOS 🆘", pendingStatus: "لم يُبلَّغ ⏳",
+    inviteFamily: "دعوة أفراد العائلة", members: "أعضاء",
+    familyGroups: "مجموعات العائلة", totalSafe: "بأمان", of: "من",
+    shelter: "ملجأ", inviteValidity: "صالح: 24 ساعة",
+    sendingSafe: "جارٍ الإرسال...", sent: "تم الإرسال! ✅",
+    sosTitle: "SOS طوارئ", sosDesc: "سيتلقى جميع أفراد العائلة تنبيه طوارئ فوري",
+    sosSend: "🆘 إرسال SOS للجميع", cancel: "إلغاء",
+    settingsItems: [
+      { icon: "📍", label: "مشاركة الموقع", value: "نشط", color: "#22c55e" },
+      { icon: "🔔", label: "الإشعارات", value: "نشط", color: "#22c55e" },
+      { icon: "🌐", label: "اللغة", value: "العربية", color: "#60a5fa" },
+      { icon: "👥", label: "إعدادات المجموعة", value: "›", color: "#94a3b8" },
+      { icon: "🔐", label: "موافقة الانضمام", value: "يدوي", color: "#f59e0b" },
+    ],
+    checklistItems: [
+      { id:1, text:"ماء (3 لتر للشخص)", cat:"طعام" },
+      { id:2, text:"طعام معلب", cat:"طعام" },
+      { id:3, text:"راديو بالبطاريات", cat:"معدات" },
+      { id:4, text:"مصباح يدوي + بطاريات", cat:"معدات" },
+      { id:5, text:"أدوية موصوفة", cat:"طبي" },
+      { id:6, text:"حقيبة إسعافات أولية", cat:"طبي" },
+      { id:7, text:"وثائق الهوية، جواز السفر", cat:"وثائق" },
+      { id:8, text:"نقود", cat:"وثائق" },
+      { id:9, text:"بنك طاقة", cat:"معدات" },
+      { id:10, text:"طعام الحيوانات الأليفة", cat:"حيوانات" },
+    ],
+  },
+  fr: {
+    dir: "ltr", appName: "Bouclier Famille", tagline: "Ensemble, en sécurité",
+    iAmSafe: "Je suis en sécurité", iAmSafeWith: "Je suis en sécurité + Position", sos: "SOS Urgence",
+    dashboard: "Tableau de bord", family: "Ma famille", checklist: "Liste abri", settings: "Paramètres",
+    allSafe: "Tout le monde est en sécurité ✓", waitingFor: "En attente de rapports...",
+    justNow: "À l'instant", minutesAgo: "Il y a {n} min", hoursAgo: "Il y a {n}h",
+    safeStatus: "En sécurité ✅", sosStatus: "SOS 🆘", pendingStatus: "Pas de rapport ⏳",
+    inviteFamily: "Inviter la famille", members: "membres",
+    familyGroups: "Groupes familiaux", totalSafe: "en sécurité", of: "sur",
+    shelter: "Abri", inviteValidity: "Valide: 24 heures",
+    sendingSafe: "Envoi...", sent: "Envoyé! ✅",
+    sosTitle: "SOS Urgence", sosDesc: "Tous les membres de la famille recevront une alerte d'urgence",
+    sosSend: "🆘 Envoyer SOS à tous", cancel: "Annuler",
+    settingsItems: [
+      { icon: "📍", label: "Partage de position", value: "Actif", color: "#22c55e" },
+      { icon: "🔔", label: "Notifications", value: "Actif", color: "#22c55e" },
+      { icon: "🌐", label: "Langue", value: "Français", color: "#60a5fa" },
+      { icon: "👥", label: "Paramètres du groupe", value: "›", color: "#94a3b8" },
+      { icon: "🔐", label: "Approbation d'accès", value: "Manuel", color: "#f59e0b" },
+    ],
+    checklistItems: [
+      { id:1, text:"Eau (3L par personne)", cat:"Nourriture" },
+      { id:2, text:"Conserves alimentaires", cat:"Nourriture" },
+      { id:3, text:"Radio à piles", cat:"Équipement" },
+      { id:4, text:"Lampe torche + piles", cat:"Équipement" },
+      { id:5, text:"Médicaments sur ordonnance", cat:"Médical" },
+      { id:6, text:"Trousse de premiers secours", cat:"Médical" },
+      { id:7, text:"Documents d'identité, passeport", cat:"Documents" },
+      { id:8, text:"Espèces", cat:"Documents" },
+      { id:9, text:"Batterie externe", cat:"Équipement" },
+      { id:10, text:"Nourriture pour animaux", cat:"Animaux" },
+    ],
+  },
+};
+
+const members = [
+  { id:1, name:"עדי", role:"אמא", emoji:"👩", status:"safe", time:2, location:"תל אביב" },
+  { id:2, name:"יונתן", role:"אבא", emoji:"👨", status:"safe", time:0, location:"רמת גן" },
+  { id:3, name:"מאיה", role:"בת", emoji:"👧", status:"pending", time:null, location:null },
+  { id:4, name:"נועם", role:"בן", emoji:"👦", status:"safe", time:8, location:"פתח תקווה" },
+  { id:5, name:"סבא משה", role:"סבא", emoji:"👴", status:"safe", time:15, location:"גבעתיים" },
+  { id:6, name:"סבתא רות", role:"סבתא", emoji:"👵", status:"safe", time:15, location:"גבעתיים" },
+];
+
+const subgroups = [
+  { id:1, name:"משפחת דוד (אחי)", safe:3, total:3, emoji:"👨‍👩‍👧" },
+  { id:2, name:"משפחת מיכל (אחות)", safe:4, total:5, emoji:"👨‍👩‍👧‍👦" },
+];
+
+const checked = {};
+let currentLang = "he";
+let currentTab = "home";
+
+function timeLabel(mins, t) {
+  if (mins === null) return t.pendingStatus;
+  if (mins === 0) return t.justNow;
+  if (mins < 60) return t.minutesAgo.replace("{n}", mins);
+  return t.hoursAgo.replace("{n}", Math.floor(mins / 60));
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  const t = i18n[lang];
+  document.documentElement.lang = lang;
+  document.documentElement.dir = t.dir;
+  document.body.style.fontFamily = t.dir === "rtl"
+    ? "'Heebo', 'Segoe UI', sans-serif"
+    : "'DM Sans', 'Segoe UI', sans-serif";
+
+  document.querySelectorAll(".lang-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.textContent.toLowerCase() === lang);
+  });
+
+  document.getElementById("appName").textContent = t.appName;
+  document.getElementById("tagline").textContent = t.tagline;
+  document.getElementById("btnMainText").textContent = t.iAmSafeWith;
+  document.getElementById("btnSmallText").textContent = "✅ " + t.iAmSafe;
+  document.getElementById("btnSosText").textContent = "🆘 " + t.sos;
+  document.getElementById("familyLabel").textContent = t.family;
+  document.getElementById("groupsLabel").textContent = t.familyGroups;
+  document.getElementById("inviteBtn").textContent = "+ " + t.inviteFamily;
+  document.getElementById("shelterLabel").textContent = t.shelter;
+  document.getElementById("navHome").textContent = t.dashboard;
+  document.getElementById("navChecklist").textContent = t.checklist;
+  document.getElementById("navSettings").textContent = t.settings;
+  document.getElementById("inviteTitle").textContent = t.inviteFamily;
+  document.getElementById("inviteValidity").textContent = t.inviteValidity;
+  document.getElementById("sosTitle").textContent = t.sosTitle;
+  document.getElementById("sosDesc").textContent = t.sosDesc;
+  document.getElementById("sosConfirmBtn").textContent = t.sosSend;
+  document.getElementById("sosCancelBtn").textContent = t.cancel;
+  document.getElementById("settingsLabel").textContent = t.settings;
+  document.getElementById("member-status").style.textAlign = t.dir === "rtl" ? "right" : "left";
+
+  renderMembers();
+  renderSubgroups();
+  renderChecklist();
+  renderSettings();
+  updateStatus();
+}
+
+function renderMembers() {
+  const t = i18n[currentLang];
+  const list = document.getElementById("membersList");
+  list.innerHTML = members.map(m => `
+    <div class="member-card ${m.status}" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;margin-bottom:8px;background:rgba(255,255,255,0.04);border:1px solid ${m.status==='safe'?'rgba(34,197,94,0.15)':m.status==='sos'?'rgba(239,68,68,0.3)':'rgba(255,255,255,0.06)'};transition:all 0.3s;">
+      <div style="font-size:26px">${m.emoji}</div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:600">${m.name}</div>
+        <div style="font-size:11px;color:#64748b">${m.role}${m.location ? ' · ' + m.location : ''}</div>
+      </div>
+      <div id="member-status" style="text-align:${t.dir==='rtl'?'right':'left'}">
+        <div style="font-size:12px;font-weight:700;color:${m.status==='safe'?'#22c55e':m.status==='sos'?'#ef4444':'#94a3b8'}">
+          ${m.status==='safe'?t.safeStatus:m.status==='sos'?t.sosStatus:t.pendingStatus}
+        </div>
+        ${m.time!==null?`<div style="font-size:10px;color:#475569">${timeLabel(m.time,t)}</div>`:''}
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderSubgroups() {
+  const t = i18n[currentLang];
+  const list = document.getElementById("subgroupsList");
+  list.innerHTML = subgroups.map(g => `
+    <div style="padding:12px 14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+      <div style="font-size:22px">${g.emoji}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600">${g.name}</div>
+        <div style="font-size:11px;color:#64748b">${g.total} ${t.members}</div>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:${g.safe===g.total?'#22c55e':'#eab308'}">${g.safe}/${g.total} ✓</div>
+    </div>
+  `).join("");
+}
+
+function renderChecklist() {
+  const t = i18n[currentLang];
+  const checkedCount = Object.values(checked).filter(Boolean).length;
+  document.getElementById("checklistSub").textContent = `${checkedCount}/${t.checklistItems.length}`;
+  document.getElementById("checklistPct").textContent = Math.round((checkedCount / t.checklistItems.length) * 100) + "%";
+
+  const list = document.getElementById("checklistItems");
+  list.innerHTML = t.checklistItems.map(item => `
+    <div class="check-item ${checked[item.id] ? 'checked' : ''}" onclick="toggleCheck(${item.id})">
+      <div class="check-box">${checked[item.id] ? '✓' : ''}</div>
+      <div class="check-text">${item.text}</div>
+      <div class="check-cat">${item.cat}</div>
+    </div>
+  `).join("");
+}
+
+function renderSettings() {
+  const t = i18n[currentLang];
+  const list = document.getElementById("settingsList");
+  list.innerHTML = t.settingsItems.map(s => `
+    <div class="setting-card">
+      <div class="setting-icon">${s.icon}</div>
+      <div class="setting-label">${s.label}</div>
+      <div class="setting-val" style="color:${s.color}">${s.value}</div>
+    </div>
+  `).join("");
+}
+
+function updateStatus() {
+  const t = i18n[currentLang];
+  const safeCount = members.filter(m => m.status === "safe").length;
+  const allSafe = safeCount === members.length;
+  const banner = document.getElementById("statusBanner");
+  banner.className = "status-banner" + (allSafe ? " all-safe" : "");
+  document.getElementById("statusTitle").textContent = allSafe ? t.allSafe : t.waitingFor;
+  document.getElementById("statusSub").textContent = `${safeCount} ${t.of} ${members.length} ${t.totalSafe}`;
+  document.getElementById("statusIcon").textContent = allSafe ? "🟢" : "🟡";
+}
+
+function handleSafe(withLocation) {
+  const t = i18n[currentLang];
+  const btn = document.getElementById("btnSafeMain");
+  const icon = document.getElementById("btnMainIcon");
+  const text = document.getElementById("btnMainText");
+  btn.disabled = true;
+  icon.textContent = "⏳";
+  text.textContent = t.sendingSafe;
+  setTimeout(() => {
+    icon.textContent = "✅";
+    text.textContent = t.sent;
+    btn.classList.add("sent");
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.classList.remove("sent");
+      icon.textContent = "🟢";
+      text.textContent = t.iAmSafeWith;
+    }, 3000);
+  }, 1200);
+}
+
+function toggleCheck(id) {
+  checked[id] = !checked[id];
+  renderChecklist();
+}
+
+function sendSOS() {
+  document.getElementById("sosOverlay").classList.remove("open");
+  alert("🆘 SOS נשלח לכל בני המשפחה!");
+}
+
+function setTab(tab) {
+  currentTab = tab;
+  ["home","checklist","settings"].forEach(t => {
+    document.getElementById("tab-" + t).classList.toggle("hidden", t !== tab);
+    document.getElementById("nav-" + t).classList.toggle("active", t === tab);
+  });
+}
+
+// Init
+setLang("he");
+</script>
+</body>
+</html>

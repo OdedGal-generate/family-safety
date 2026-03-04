@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { usePendingRequests, useReviewRequest } from "../api/hooks";
 import { subscribeToPush } from "../services/pushNotifications";
 
-const LANGUAGES = ["he", "en", "ar", "fr"];
+const LANGUAGES = ["he", "en", "ar", "fr", "es", "ru", "fa", "zh", "ja", "uk"];
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
@@ -76,12 +76,12 @@ export default function SettingsScreen() {
         <div className="flex-1 text-sm">
           {t("settingsItems.language.label")}
         </div>
-        <div className="flex gap-1">
+        <div className="flex gap-1 overflow-x-auto max-w-[200px] scrollbar-none">
           {LANGUAGES.map((lng) => (
             <button
               key={lng}
               onClick={() => i18n.changeLanguage(lng)}
-              className={`px-2 py-1 rounded-md border-none cursor-pointer text-[11px] font-semibold transition-all ${
+              className={`px-2 py-1 rounded-md border-none cursor-pointer text-[11px] font-semibold transition-all shrink-0 ${
                 i18n.language === lng
                   ? "bg-[rgba(96,165,250,0.2)] text-accent-blue"
                   : "bg-[rgba(255,255,255,0.05)] text-text-secondary"

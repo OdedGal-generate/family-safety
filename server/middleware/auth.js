@@ -1,9 +1,9 @@
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || "family-shield-dev-secret";
+const JWT_SECRET = process.env.JWT_SECRET || "family-shield-dev-secret-change-in-production";
 
 export function signToken(userId) {
-  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: "30d" });
+  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: "7d" });
 }
 
 export function verifyToken(token) {

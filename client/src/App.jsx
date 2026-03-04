@@ -14,7 +14,7 @@ import { useGroupStatus, usePostStatus } from "./api/hooks";
 import { isLoggedIn } from "./api/client";
 import { subscribeToPush } from "./services/pushNotifications";
 
-const LANGUAGES = ["he", "en", "ar", "fr"];
+const LANGUAGES = ["he", "en", "ar", "fr", "es", "ru", "fa", "zh", "ja", "uk"];
 const ONBOARDED_KEY = "familyShield_onboarded";
 
 function App() {
@@ -107,12 +107,12 @@ function App() {
           </div>
         </div>
 
-        <div className="flex gap-1">
+        <div className="flex gap-1 overflow-x-auto max-w-[180px] scrollbar-none">
           {LANGUAGES.map((lng) => (
             <button
               key={lng}
               onClick={() => i18n.changeLanguage(lng)}
-              className={`px-2 py-1 rounded-md border-none cursor-pointer text-[11px] font-semibold transition-all ${
+              className={`px-2 py-1 rounded-md border-none cursor-pointer text-[11px] font-semibold transition-all shrink-0 ${
                 i18n.language === lng
                   ? "bg-green-active text-accent-green"
                   : "bg-[rgba(255,255,255,0.05)] text-text-secondary"

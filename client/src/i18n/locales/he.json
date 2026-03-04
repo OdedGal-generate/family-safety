@@ -35,7 +35,13 @@
     "he": "עברית",
     "en": "English",
     "ar": "العربية",
-    "fr": "Français"
+    "fr": "Français",
+    "es": "Español",
+    "ru": "Русский",
+    "fa": "فارسی",
+    "zh": "中文",
+    "ja": "日本語",
+    "uk": "Українська"
   },
   "settingsItems": {
     "locationSharing": { "label": "שיתוף מיקום", "value": "פעיל" },

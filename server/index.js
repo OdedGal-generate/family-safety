@@ -90,7 +90,7 @@ app.use("/api/auth", authSlowDown, authLimiter, authRoutes);
 app.use("/api/groups", apiLimiter, groupRoutes);
 app.use("/api/status", apiLimiter, statusRoutes);
 app.use("/api/push", apiLimiter, pushRoutes);
-app.use("/admin", adminRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

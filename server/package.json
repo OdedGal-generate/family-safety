@@ -8,6 +8,7 @@
     "start": "node index.js"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "better-sqlite3": "^11.8.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -17,6 +18,8 @@
     "helmet": "^8.1.0",
     "joi": "^18.0.2",
     "jsonwebtoken": "^9.0.3",
+    "otplib": "^13.3.0",
+    "qrcode": "^1.5.4",
     "uuid": "^13.0.0",
     "web-push": "^3.6.7"
   }

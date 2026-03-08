@@ -1,4 +1,5 @@
 import db from "./index.js";
+import bcrypt from "bcryptjs";
 
 export function createTables() {
   db.exec(`
@@ -87,8 +88,24 @@ export function createTables() {
     );
 
     CREATE INDEX IF NOT EXISTS idx_push_subscriptions_user ON push_subscriptions(user_id);
+
+    CREATE TABLE IF NOT EXISTS admin_settings (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      password_hash TEXT NOT NULL,
+      totp_secret TEXT,
+      totp_enabled INTEGER DEFAULT 0,
+      updated_at TEXT DEFAULT (datetime('now'))
+    );
   `);
 
   // Cleanup: drop legacy tables if they exist
   db.exec("DROP TABLE IF EXISTS otp_codes");
+
+  // Seed default admin password if admin_settings is empty
+  const adminCount = db.prepare("SELECT COUNT(*) as c FROM admin_settings").get().c;
+  if (adminCount === 0) {
+    const hash = bcrypt.hashSync("admin-2024", 10);
+    db.prepare("INSERT INTO admin_settings (id, password_hash) VALUES (1, ?)").run(hash);
+    console.log("Admin default password seeded");
+  }
 }

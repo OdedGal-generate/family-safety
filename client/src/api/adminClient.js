@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const ADMIN_KEY_STORAGE = "familyShield_adminKey";
+const TOKEN_KEY = "familyShield_adminToken";
 
 // Resolve base URL same as client.js, but target /api/admin
 let baseURL = (import.meta.env.VITE_API_URL || "/api").replace(/\/+$/, "");
@@ -15,23 +15,28 @@ const adminApi = axios.create({
 });
 
 adminApi.interceptors.request.use((config) => {
-  const key = sessionStorage.getItem(ADMIN_KEY_STORAGE);
-  if (key) {
-    config.headers["x-admin-key"] = key;
+  const token = sessionStorage.getItem(TOKEN_KEY);
+  if (token) {
+    config.headers["Authorization"] = `Bearer ${token}`;
   }
   return config;
 });
 
-export function saveAdminKey(key) {
-  sessionStorage.setItem(ADMIN_KEY_STORAGE, key);
+export function saveAdminToken(token) {
+  sessionStorage.setItem(TOKEN_KEY, token);
 }
 
-export function getAdminKey() {
-  return sessionStorage.getItem(ADMIN_KEY_STORAGE);
+export function getAdminToken() {
+  return sessionStorage.getItem(TOKEN_KEY);
 }
 
-export function clearAdminKey() {
-  sessionStorage.removeItem(ADMIN_KEY_STORAGE);
+export function clearAdminToken() {
+  sessionStorage.removeItem(TOKEN_KEY);
 }
+
+// Backward-compat aliases (used in AdminDashboard)
+export const getAdminKey = getAdminToken;
+export const saveAdminKey = saveAdminToken;
+export const clearAdminKey = clearAdminToken;
 
 export default adminApi;

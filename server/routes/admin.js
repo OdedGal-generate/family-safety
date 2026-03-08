@@ -246,6 +246,87 @@ router.get("/groups/:id/members", (req, res) => {
   res.json({ group, members });
 });
 
+// DELETE /api/admin/groups/:id — delete group + all related data
+router.delete("/groups/:id", (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ error: "Invalid group ID" });
+  }
+
+  const group = db.prepare("SELECT id, name FROM groups WHERE id = ?").get(id);
+  if (!group) {
+    return res.status(404).json({ error: "Group not found" });
+  }
+
+  db.prepare("DELETE FROM status_updates WHERE group_id = ?").run(id);
+  db.prepare("DELETE FROM group_member_requests WHERE group_id = ?").run(id);
+  db.prepare("DELETE FROM group_invites WHERE group_id = ?").run(id);
+  db.prepare("DELETE FROM group_members WHERE group_id = ?").run(id);
+  db.prepare("DELETE FROM groups WHERE id = ?").run(id);
+
+  res.json({ deleted: group });
+});
+
+// PATCH /api/admin/groups/:id — update group name/type
+router.patch("/groups/:id", (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ error: "Invalid group ID" });
+  }
+
+  const group = db.prepare("SELECT id FROM groups WHERE id = ?").get(id);
+  if (!group) {
+    return res.status(404).json({ error: "Group not found" });
+  }
+
+  const { name, type } = req.body;
+  if (!name && !type) {
+    return res.status(400).json({ error: "Provide name or type to update" });
+  }
+
+  const validTypes = ["family", "work", "other"];
+  if (type && !validTypes.includes(type)) {
+    return res.status(400).json({ error: `Type must be one of: ${validTypes.join(", ")}` });
+  }
+
+  if (name) db.prepare("UPDATE groups SET name = ? WHERE id = ?").run(name, id);
+  if (type) db.prepare("UPDATE groups SET type = ? WHERE id = ?").run(type, id);
+
+  const updated = db.prepare("SELECT id, name, type FROM groups WHERE id = ?").get(id);
+  res.json({ updated });
+});
+
+// PATCH /api/admin/users/:id — update user name/phone
+router.patch("/users/:id", (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ error: "Invalid user ID" });
+  }
+
+  const user = db.prepare("SELECT id FROM users WHERE id = ?").get(id);
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  const { name, phone } = req.body;
+  if (!name && !phone) {
+    return res.status(400).json({ error: "Provide name or phone to update" });
+  }
+
+  if (phone) {
+    const existing = db.prepare("SELECT id FROM users WHERE phone = ? AND id != ?").get(phone, id);
+    if (existing) {
+      return res.status(409).json({ error: "Phone number already in use" });
+    }
+  }
+
+  if (name) db.prepare("UPDATE users SET name = ? WHERE id = ?").run(name, id);
+  if (phone) db.prepare("UPDATE users SET phone = ? WHERE id = ?").run(phone, id);
+
+  const updated = db.prepare("SELECT id, name, phone FROM users WHERE id = ?").get(id);
+  res.json({ updated });
+});
+
 // DELETE /api/admin/groups/:groupId/members/:userId
 router.delete("/groups/:groupId/members/:userId", (req, res) => {
   const groupId = Number(req.params.groupId);

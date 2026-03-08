@@ -96,6 +96,45 @@ export function useAdminGroupMembers(groupId) {
   });
 }
 
+export function useAdminDeleteGroup() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ groupId }) => {
+      const { data } = await adminApi.delete(`/groups/${groupId}`);
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "groups"] });
+    },
+  });
+}
+
+export function useAdminUpdateGroup() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ groupId, name, type }) => {
+      const { data } = await adminApi.patch(`/groups/${groupId}`, { name, type });
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "groups"] });
+    },
+  });
+}
+
+export function useAdminUpdateUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ userId, name, phone }) => {
+      const { data } = await adminApi.patch(`/users/${userId}`, { name, phone });
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin"] });
+    },
+  });
+}
+
 export function useAdminRemoveMember() {
   const qc = useQueryClient();
   return useMutation({

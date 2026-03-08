@@ -6,6 +6,9 @@ import {
   useAdminGroupMembers,
   useAdminRemoveMember,
   useAdminDeleteUser,
+  useAdminDeleteGroup,
+  useAdminUpdateGroup,
+  useAdminUpdateUser,
   useAdminSettings,
   useAdminChangePassword,
   useAdmin2FASetup,
@@ -81,6 +84,12 @@ const btnDanger =
 
 const cardClass =
   "bg-modal-bg rounded-2xl border border-border-subtle p-6";
+
+const smallBtnClass =
+  "px-2.5 py-1 rounded-lg text-xs font-semibold border cursor-pointer transition-all disabled:opacity-50";
+
+const smallInputClass =
+  "py-1.5 px-2.5 rounded-lg bg-[rgba(255,255,255,0.04)] border border-border-subtle text-sm text-text-primary focus:outline-none focus:border-green-border transition-all";
 
 // ══════════════════════════════════════════
 // Login Screen (with 2FA step)
@@ -501,6 +510,37 @@ function TwoFactorCard() {
 
 function AdminGroupsList({ onSelectGroup }) {
   const { data: groups, isLoading, error } = useAdminGroups();
+  const deleteGroup = useAdminDeleteGroup();
+  const updateGroup = useAdminUpdateGroup();
+  const [editingId, setEditingId] = useState(null);
+  const [editName, setEditName] = useState("");
+  const [editType, setEditType] = useState("");
+
+  const startEdit = (g, e) => {
+    e.stopPropagation();
+    setEditingId(g.id);
+    setEditName(g.name);
+    setEditType(g.type);
+  };
+
+  const saveEdit = (e) => {
+    e.stopPropagation();
+    updateGroup.mutate(
+      { groupId: editingId, name: editName, type: editType },
+      { onSuccess: () => setEditingId(null) }
+    );
+  };
+
+  const cancelEdit = (e) => {
+    e.stopPropagation();
+    setEditingId(null);
+  };
+
+  const handleDelete = (g, e) => {
+    e.stopPropagation();
+    if (!window.confirm(`Delete group "${g.name}" + all members?`)) return;
+    deleteGroup.mutate({ groupId: g.id });
+  };
 
   if (isLoading) {
     return <div className="text-text-secondary text-sm py-8 text-center">Loading groups...</div>;
@@ -530,21 +570,45 @@ function AdminGroupsList({ onSelectGroup }) {
               <th className={thClass}>Owner</th>
               <th className={thClass}>Members</th>
               <th className={thClass}>Created</th>
+              <th className={thClass}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {groups?.map((g) => (
               <tr
                 key={g.id}
-                onClick={() => onSelectGroup(g.id)}
+                onClick={() => editingId !== g.id && onSelectGroup(g.id)}
                 className={`${rowClass} cursor-pointer`}
               >
                 <td className={`${tdClass} text-text-muted font-mono text-xs`}>{g.id}</td>
-                <td className={`${tdClass} font-semibold`}>{g.name}</td>
+                <td className={`${tdClass} font-semibold`}>
+                  {editingId === g.id ? (
+                    <input
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      className={smallInputClass + " w-full"}
+                      autoFocus
+                    />
+                  ) : g.name}
+                </td>
                 <td className={tdClass}>
-                  <span className="px-2 py-0.5 rounded-md text-xs font-semibold border bg-[rgba(255,255,255,0.06)] text-text-secondary border-border-subtle">
-                    {g.type}
-                  </span>
+                  {editingId === g.id ? (
+                    <select
+                      value={editType}
+                      onChange={(e) => setEditType(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      className={smallInputClass}
+                    >
+                      <option value="family">family</option>
+                      <option value="work">work</option>
+                      <option value="other">other</option>
+                    </select>
+                  ) : (
+                    <span className="px-2 py-0.5 rounded-md text-xs font-semibold border bg-[rgba(255,255,255,0.06)] text-text-secondary border-border-subtle">
+                      {g.type}
+                    </span>
+                  )}
                 </td>
                 <td className={tdClass}>
                   <div className="text-sm">{g.owner_name}</div>
@@ -557,6 +621,41 @@ function AdminGroupsList({ onSelectGroup }) {
                 </td>
                 <td className={`${tdClass} text-text-secondary text-xs`}>
                   {formatDate(g.created_at)}
+                </td>
+                <td className={tdClass}>
+                  {editingId === g.id ? (
+                    <div className="flex gap-1">
+                      <button
+                        onClick={saveEdit}
+                        disabled={updateGroup.isPending}
+                        className={`${smallBtnClass} bg-green-bg text-accent-green border-green-border hover:bg-[rgba(34,197,94,0.2)]`}
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={cancelEdit}
+                        className={`${smallBtnClass} bg-[rgba(255,255,255,0.06)] text-text-secondary border-border-subtle hover:bg-[rgba(255,255,255,0.1)]`}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-1">
+                      <button
+                        onClick={(e) => startEdit(g, e)}
+                        className={`${smallBtnClass} bg-[rgba(96,165,250,0.1)] text-accent-blue border-blue-border hover:bg-[rgba(96,165,250,0.2)]`}
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onClick={(e) => handleDelete(g, e)}
+                        disabled={deleteGroup.isPending}
+                        className={`${smallBtnClass} bg-[rgba(239,68,68,0.1)] text-accent-red border-red-border hover:bg-[rgba(239,68,68,0.2)]`}
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  )}
                 </td>
               </tr>
             ))}
@@ -575,6 +674,10 @@ function AdminGroupMembers({ groupId, onBack }) {
   const { data, isLoading, error } = useAdminGroupMembers(groupId);
   const removeMember = useAdminRemoveMember();
   const deleteUser = useAdminDeleteUser();
+  const updateUser = useAdminUpdateUser();
+  const [editingId, setEditingId] = useState(null);
+  const [editName, setEditName] = useState("");
+  const [editPhone, setEditPhone] = useState("");
 
   const handleRemove = (member) => {
     if (!window.confirm(`Remove "${member.name}" from this group?`)) return;
@@ -589,6 +692,19 @@ function AdminGroupMembers({ groupId, onBack }) {
     )
       return;
     deleteUser.mutate({ userId: member.id });
+  };
+
+  const startEdit = (m) => {
+    setEditingId(m.id);
+    setEditName(m.name);
+    setEditPhone(m.phone);
+  };
+
+  const saveEdit = () => {
+    updateUser.mutate(
+      { userId: editingId, name: editName, phone: editPhone },
+      { onSuccess: () => setEditingId(null) }
+    );
   };
 
   if (isLoading) {
@@ -635,8 +751,25 @@ function AdminGroupMembers({ groupId, onBack }) {
             {data?.members?.map((m) => (
               <tr key={m.id} className={rowClass}>
                 <td className={`${tdClass} text-text-muted font-mono text-xs`}>{m.id}</td>
-                <td className={`${tdClass} font-semibold`}>{m.name}</td>
-                <td className={`${tdClass} text-text-secondary text-xs font-mono`}>{m.phone}</td>
+                <td className={`${tdClass} font-semibold`}>
+                  {editingId === m.id ? (
+                    <input
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      className={smallInputClass + " w-full"}
+                      autoFocus
+                    />
+                  ) : m.name}
+                </td>
+                <td className={`${tdClass} text-text-secondary text-xs font-mono`}>
+                  {editingId === m.id ? (
+                    <input
+                      value={editPhone}
+                      onChange={(e) => setEditPhone(e.target.value)}
+                      className={smallInputClass + " w-28"}
+                    />
+                  ) : m.phone}
+                </td>
                 <td className={tdClass}>{roleBadge(m.role)}</td>
                 <td className={`${tdClass} text-text-secondary text-xs`}>
                   {formatDate(m.joined_at)}
@@ -646,22 +779,48 @@ function AdminGroupMembers({ groupId, onBack }) {
                   {formatDateTime(m.last_seen)}
                 </td>
                 <td className={tdClass}>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleRemove(m)}
-                      disabled={removeMember.isPending}
-                      className="px-2.5 py-1 rounded-lg text-xs font-semibold border cursor-pointer bg-[rgba(234,179,8,0.1)] text-accent-yellow border-yellow-border hover:bg-[rgba(234,179,8,0.2)] transition-all disabled:opacity-50"
-                    >
-                      Remove
-                    </button>
-                    <button
-                      onClick={() => handleDelete(m)}
-                      disabled={deleteUser.isPending}
-                      className="px-2.5 py-1 rounded-lg text-xs font-semibold border cursor-pointer bg-[rgba(239,68,68,0.1)] text-accent-red border-red-border hover:bg-[rgba(239,68,68,0.2)] transition-all disabled:opacity-50"
-                    >
-                      Delete User
-                    </button>
-                  </div>
+                  {editingId === m.id ? (
+                    <div className="flex gap-1">
+                      <button
+                        onClick={saveEdit}
+                        disabled={updateUser.isPending}
+                        className={`${smallBtnClass} bg-green-bg text-accent-green border-green-border hover:bg-[rgba(34,197,94,0.2)]`}
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className={`${smallBtnClass} bg-[rgba(255,255,255,0.06)] text-text-secondary border-border-subtle hover:bg-[rgba(255,255,255,0.1)]`}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => startEdit(m)}
+                        className={`${smallBtnClass} bg-[rgba(96,165,250,0.1)] text-accent-blue border-blue-border hover:bg-[rgba(96,165,250,0.2)]`}
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onClick={() => handleRemove(m)}
+                        disabled={removeMember.isPending}
+                        className={`${smallBtnClass} bg-[rgba(234,179,8,0.1)] text-accent-yellow border-yellow-border hover:bg-[rgba(234,179,8,0.2)]`}
+                        title="Remove from group"
+                      >
+                        Remove
+                      </button>
+                      <button
+                        onClick={() => handleDelete(m)}
+                        disabled={deleteUser.isPending}
+                        className={`${smallBtnClass} bg-[rgba(239,68,68,0.1)] text-accent-red border-red-border hover:bg-[rgba(239,68,68,0.2)]`}
+                        title="Delete user entirely"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  )}
                 </td>
               </tr>
             ))}
@@ -702,6 +861,12 @@ export default function AdminDashboard() {
           <h1 className="text-[15px] font-bold tracking-tight">Admin Dashboard</h1>
         </div>
         <div className="flex items-center gap-2">
+          <a
+            href="https://family-safety.vercel.app"
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer bg-[rgba(255,255,255,0.06)] text-text-secondary border-border-subtle hover:bg-[rgba(255,255,255,0.1)] transition-all no-underline"
+          >
+            🏠 App
+          </a>
           <button
             onClick={() => {
               setView(view === "settings" ? "groups" : "settings");
